@@ -1,8 +1,11 @@
 package assets
 
-import _ "embed"
+import (
+	"embed"
+)
 
 var (
-	//go:embed images/background.png
-	BackgroundImage []byte
+	//go:embed images/backgrounds
+	BackgroundImagesDir     embed.FS
+	BackgroundImagesDirPath = "images/backgrounds"
 )
