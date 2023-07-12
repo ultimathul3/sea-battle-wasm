@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	g := &game.Game{}
+	g := game.New()
 
 	ebiten.SetWindowSize(game.WindowWidth, game.WindowHeight)
 	ebiten.SetWindowTitle(game.WindowTitle)
