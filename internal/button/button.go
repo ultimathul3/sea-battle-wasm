@@ -30,10 +30,8 @@ type Button struct {
 	touch      Touch
 }
 
-func New(x, y int, text Text, touch Touch, label string, color, hoverColor color.Color) *Button {
+func New(text Text, touch Touch, label string, color, hoverColor color.Color) *Button {
 	button := &Button{
-		x:          x,
-		y:          y,
 		text:       text,
 		label:      label,
 		color:      color,
@@ -53,11 +51,13 @@ func (b *Button) Update(callback func()) {
 	}
 }
 
-func (b *Button) Draw(screen *ebiten.Image) {
+func (b *Button) Draw(screen *ebiten.Image, x, y int) {
+	b.x, b.y = x, y
+
 	if b.IsHovered() {
-		b.text.DrawMedium(screen, b.label, b.x, b.y, b.hoverColor)
+		b.text.DrawMedium(screen, b.label, x, y, b.hoverColor)
 	} else {
-		b.text.DrawMedium(screen, b.label, b.x, b.y, b.color)
+		b.text.DrawMedium(screen, b.label, x, y, b.color)
 	}
 }
 

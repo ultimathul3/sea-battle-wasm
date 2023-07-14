@@ -11,11 +11,13 @@ const (
 const (
 	createGameText = "Создать игру"
 	joinGameText   = "Присоединиться"
+	backButtonText = "<-"
 )
 
 var (
-	GrayColor  = color.Gray{100}
-	GreenColor = color.RGBA{0, 200, 0, 255}
+	GrayColor      = color.Gray{100}
+	GreenColor     = color.RGBA{0, 200, 0, 255}
+	DarkGreenColor = color.RGBA{0, 100, 0, 255}
 )
 
 const (
