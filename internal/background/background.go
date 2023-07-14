@@ -17,7 +17,7 @@ func New(images []*ebiten.Image, animationSpeed uint8) *Background {
 	}
 }
 
-func (b *Background) Update() error {
+func (b *Background) Update() {
 	if b.clock > int(b.animationSpeed) {
 		if b.dir {
 			b.offset++
@@ -37,8 +37,6 @@ func (b *Background) Update() error {
 		b.offset = len(b.images) - 1
 		b.dir = !b.dir
 	}
-
-	return nil
 }
 
 func (b *Background) Draw(screen *ebiten.Image) {
