@@ -8,6 +8,7 @@ import (
 	"github.com/ultimathul3/sea-battle-wasm/assets"
 	"github.com/ultimathul3/sea-battle-wasm/internal/background"
 	"github.com/ultimathul3/sea-battle-wasm/internal/button"
+	"github.com/ultimathul3/sea-battle-wasm/internal/config"
 	"github.com/ultimathul3/sea-battle-wasm/internal/state"
 	"github.com/ultimathul3/sea-battle-wasm/internal/text"
 	"github.com/ultimathul3/sea-battle-wasm/internal/touch"
@@ -19,17 +20,19 @@ type Game struct {
 	text       *text.Text
 	touch      *touch.Touch
 	state      state.State
+	cfg        *config.Config
 
 	createGameButton *button.Button
 	joinGameButton   *button.Button
 	backButton       *button.Button
 }
 
-func New() *Game {
+func New(cfg *config.Config) *Game {
 	game := &Game{
 		assets: assets.New(),
 		touch:  touch.New(),
 		state:  state.Menu,
+		cfg:    cfg,
 	}
 
 	game.background = background.New(game.assets.BackgroundImages, backgroundAnimationSpeed)
