@@ -35,9 +35,9 @@ func New() *Game {
 	game.background = background.New(game.assets.BackgroundImages, backgroundAnimationSpeed)
 	game.text = text.New(game.assets.LargeFont, game.assets.MediumFont, yLargeFontOffset, yMediumFontOffset)
 
-	game.createGameButton = button.New(game.text, game.touch, createGameText, GrayColor, GreenColor)
-	game.joinGameButton = button.New(game.text, game.touch, joinGameText, GrayColor, GreenColor)
-	game.backButton = button.New(game.text, game.touch, backButtonText, GrayColor, DarkGreenColor)
+	game.createGameButton = button.New(game.text, game.touch, game.assets.ButtonTickPlayer, createGameText, GrayColor, GreenColor)
+	game.joinGameButton = button.New(game.text, game.touch, game.assets.ButtonTickPlayer, joinGameText, GrayColor, GreenColor)
+	game.backButton = button.New(game.text, game.touch, game.assets.ButtonTickPlayer, backButtonText, GrayColor, DarkGreenColor)
 
 	return game
 }

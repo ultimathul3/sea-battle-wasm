@@ -8,6 +8,8 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 )
@@ -16,6 +18,7 @@ type Assets struct {
 	BackgroundImages []*ebiten.Image
 	LargeFont        font.Face
 	MediumFont       font.Face
+	ButtonTickPlayer *audio.Player
 }
 
 func New() *Assets {
@@ -25,7 +28,26 @@ func New() *Assets {
 		BackgroundImages: loadBackgroundImages(),
 		LargeFont:        largeFont,
 		MediumFont:       mediumFont,
+		ButtonTickPlayer: loadSounds(),
 	}
+}
+
+func loadSounds() *audio.Player {
+	sampleRate := 44100
+
+	context := audio.NewContext(sampleRate)
+
+	buttonTickStream, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(ButtonTickSound))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	buttonTickPlayer, err := context.NewPlayer(buttonTickStream)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return buttonTickPlayer
 }
 
 func loadFonts() (font.Face, font.Face) {

@@ -14,3 +14,8 @@ var (
 	//go:embed fonts/main.otf
 	MainOTF []byte
 )
+
+var (
+	//go:embed sounds/button_tick.ogg
+	ButtonTickSound []byte
+)

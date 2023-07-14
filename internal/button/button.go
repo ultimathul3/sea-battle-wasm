@@ -12,53 +12,72 @@ const (
 	buttonHeight = 42
 )
 
-type Text interface {
+type Texter interface {
 	DrawMedium(screen *ebiten.Image, text string, x, y int, color color.Color)
 }
 
-type Touch interface {
+type Toucher interface {
 	IsTouched() (int, int, bool)
 }
 
-type Button struct {
-	x, y       int
-	text       Text
-	label      string
-	color      color.Color
-	hoverColor color.Color
-	width      int
-	touch      Touch
+type TickPlayer interface {
+	Play()
+	Rewind() error
 }
 
-func New(text Text, touch Touch, label string, color, hoverColor color.Color) *Button {
+type Button struct {
+	x, y         int
+	texter       Texter
+	label        string
+	color        color.Color
+	hoverColor   color.Color
+	currentColor color.Color
+	width        int
+	toucher      Toucher
+	tickPlayer   TickPlayer
+	tickPlayed   bool
+}
+
+func New(text Texter, touch Toucher, tickPlayer TickPlayer, label string, color, hoverColor color.Color) *Button {
 	button := &Button{
-		text:       text,
+		texter:     text,
 		label:      label,
 		color:      color,
 		hoverColor: hoverColor,
-		touch:      touch,
+		toucher:    touch,
+		tickPlayer: tickPlayer,
 	}
 
 	button.width = utf8.RuneCountInString(button.label) * charWidth
+	button.currentColor = color
 
 	return button
 }
 
 func (b *Button) Update(callback func()) {
-	_, _, isTouched := b.touch.IsTouched()
-	if b.IsHovered() && isTouched {
+	_, _, isTouched := b.toucher.IsTouched()
+	isHovered := b.IsHovered()
+
+	if isHovered && isTouched {
 		callback()
+	}
+
+	if isHovered {
+		if !b.tickPlayed {
+			b.tickPlayer.Rewind()
+			b.tickPlayer.Play()
+			b.tickPlayed = true
+		}
+		b.currentColor = b.hoverColor
+	} else {
+		b.tickPlayed = false
+		b.currentColor = b.color
 	}
 }
 
 func (b *Button) Draw(screen *ebiten.Image, x, y int) {
 	b.x, b.y = x, y
-
-	if b.IsHovered() {
-		b.text.DrawMedium(screen, b.label, x, y, b.hoverColor)
-	} else {
-		b.text.DrawMedium(screen, b.label, x, y, b.color)
-	}
+	b.texter.DrawMedium(screen, b.label, x, y, b.currentColor)
 }
 
 func (b *Button) IsHovered() bool {
