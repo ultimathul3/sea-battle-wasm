@@ -33,11 +33,9 @@ func New() *Assets {
 }
 
 func loadSounds() *audio.Player {
-	sampleRate := 44100
+	context := audio.NewContext(SoundsSampleRate)
 
-	context := audio.NewContext(sampleRate)
-
-	buttonTickStream, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(ButtonTickSound))
+	buttonTickStream, err := vorbis.DecodeWithSampleRate(SoundsSampleRate, bytes.NewReader(ButtonTickSound))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,6 +44,8 @@ func loadSounds() *audio.Player {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	buttonTickPlayer.SetVolume(0.3)
 
 	return buttonTickPlayer
 }
@@ -57,8 +57,8 @@ func loadFonts() (font.Face, font.Face) {
 	}
 
 	largeFont, err := opentype.NewFace(otf, &opentype.FaceOptions{
-		Size:    72,
-		DPI:     144,
+		Size:    LargeFontSize,
+		DPI:     LargeFontDPI,
 		Hinting: font.HintingVertical,
 	})
 	if err != nil {
@@ -66,8 +66,8 @@ func loadFonts() (font.Face, font.Face) {
 	}
 
 	mediumFont, err := opentype.NewFace(otf, &opentype.FaceOptions{
-		Size:    48,
-		DPI:     96,
+		Size:    MediumFontSize,
+		DPI:     MediumFontDPI,
 		Hinting: font.HintingVertical,
 	})
 	if err != nil {

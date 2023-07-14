@@ -8,8 +8,8 @@ import (
 )
 
 const (
+	ButtonHeight = 42
 	charWidth    = 20
-	buttonHeight = 42
 )
 
 type Texter interface {
@@ -26,9 +26,10 @@ type TickPlayer interface {
 }
 
 type Button struct {
+	Label string
+
 	x, y         int
 	texter       Texter
-	label        string
 	color        color.Color
 	hoverColor   color.Color
 	currentColor color.Color
@@ -41,21 +42,21 @@ type Button struct {
 func New(text Texter, touch Toucher, tickPlayer TickPlayer, label string, color, hoverColor color.Color) *Button {
 	button := &Button{
 		texter:     text,
-		label:      label,
+		Label:      label,
 		color:      color,
 		hoverColor: hoverColor,
 		toucher:    touch,
 		tickPlayer: tickPlayer,
 	}
 
-	button.width = utf8.RuneCountInString(button.label) * charWidth
+	button.width = utf8.RuneCountInString(button.Label) * charWidth
 	button.currentColor = color
 
 	return button
 }
 
 func (b *Button) Update(callback func()) {
-	if b.IsTouchHovered() {
+	if b.IsTouchHovered() && callback != nil {
 		callback()
 	}
 
@@ -75,15 +76,15 @@ func (b *Button) Update(callback func()) {
 
 func (b *Button) Draw(screen *ebiten.Image, x, y int) {
 	b.x, b.y = x, y
-	b.texter.DrawMedium(screen, b.label, x, y, b.currentColor)
+	b.texter.DrawMedium(screen, b.Label, x, y, b.currentColor)
 }
 
 func (b *Button) IsHovered() bool {
 	mx, my := ebiten.CursorPosition()
-	return mx > b.x && mx < b.x+b.width && my > b.y && my < b.y+buttonHeight
+	return mx > b.x && mx < b.x+b.width && my > b.y && my < b.y+ButtonHeight
 }
 
 func (b *Button) IsTouchHovered() bool {
 	tx, ty, isTouched := b.toucher.IsTouched()
-	return isTouched && tx > b.x && tx < b.x+b.width && ty > b.y && ty < b.y+buttonHeight
+	return isTouched && tx > b.x && tx < b.x+b.width && ty > b.y && ty < b.y+ButtonHeight
 }

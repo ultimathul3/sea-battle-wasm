@@ -10,7 +10,7 @@ const (
 
 type Config struct {
 	HttpServer struct {
-		IP   string `env:"HTTP_SERVER_IP"`
+		Host string `env:"HTTP_SERVER_HOST"`
 		Port uint16 `env:"HTTP_SERVER_PORT"`
 	}
 }
