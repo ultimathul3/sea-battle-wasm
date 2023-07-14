@@ -55,13 +55,11 @@ func New(text Texter, touch Toucher, tickPlayer TickPlayer, label string, color,
 }
 
 func (b *Button) Update(callback func()) {
-	_, _, isTouched := b.toucher.IsTouched()
-	isHovered := b.IsHovered()
-
-	if isHovered && isTouched {
+	if b.IsTouchHovered() {
 		callback()
 	}
 
+	isHovered := b.IsHovered()
 	if isHovered {
 		if !b.tickPlayed {
 			b.tickPlayer.Rewind()
@@ -83,4 +81,9 @@ func (b *Button) Draw(screen *ebiten.Image, x, y int) {
 func (b *Button) IsHovered() bool {
 	mx, my := ebiten.CursorPosition()
 	return mx > b.x && mx < b.x+b.width && my > b.y && my < b.y+buttonHeight
+}
+
+func (b *Button) IsTouchHovered() bool {
+	tx, ty, isTouched := b.toucher.IsTouched()
+	return isTouched && tx > b.x && tx < b.x+b.width && ty > b.y && ty < b.y+buttonHeight
 }
