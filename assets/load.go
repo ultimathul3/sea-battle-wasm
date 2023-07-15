@@ -19,6 +19,14 @@ type Assets struct {
 	LargeFont        font.Face
 	MediumFont       font.Face
 	ButtonTickPlayer *audio.Player
+
+	SingleDeckShipImage *ebiten.Image
+	DoubleDeckShipImage *ebiten.Image
+	ThreeDeckShipImage  *ebiten.Image
+	FourDeckShipImage   *ebiten.Image
+
+	FieldImage  *ebiten.Image
+	SelectImage *ebiten.Image
 }
 
 func New() *Assets {
@@ -29,6 +37,14 @@ func New() *Assets {
 		LargeFont:        largeFont,
 		MediumFont:       mediumFont,
 		ButtonTickPlayer: loadSounds(),
+
+		SingleDeckShipImage: imageFromBytes(SingleDeckShipImage),
+		DoubleDeckShipImage: imageFromBytes(DoubleDeckShipImage),
+		ThreeDeckShipImage:  imageFromBytes(ThreeDeckShipImage),
+		FourDeckShipImage:   imageFromBytes(FourDeckShipImage),
+
+		FieldImage:  imageFromBytes(FieldImage),
+		SelectImage: imageFromBytes(SelectImage),
 	}
 }
 

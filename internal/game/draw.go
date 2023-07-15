@@ -18,6 +18,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	case state.CreateGame:
 		g.backButton.Draw(screen, 9, 9)
+		g.field.Draw(screen)
 
 	case state.JoinGame:
 		g.backButton.Draw(screen, 9, 9)

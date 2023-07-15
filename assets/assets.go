@@ -24,3 +24,21 @@ var (
 	ButtonTickSound  []byte
 	SoundsSampleRate = 44100
 )
+
+var (
+	//go:embed images/ships/1.png
+	SingleDeckShipImage []byte
+	//go:embed images/ships/2.png
+	DoubleDeckShipImage []byte
+	//go:embed images/ships/3.png
+	ThreeDeckShipImage []byte
+	//go:embed images/ships/4.png
+	FourDeckShipImage []byte
+)
+
+var (
+	//go:embed images/field/field.png
+	FieldImage []byte
+	//go:embed images/select.png
+	SelectImage []byte
+)

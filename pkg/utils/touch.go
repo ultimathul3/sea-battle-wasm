@@ -1,4 +1,4 @@
-package touch
+package utils
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
@@ -9,7 +9,7 @@ type Touch struct {
 	touchIDs []ebiten.TouchID
 }
 
-func New() *Touch {
+func NewTouch() *Touch {
 	return &Touch{}
 }
 

@@ -18,10 +18,11 @@ const (
 )
 
 var (
-	GrayColor      = color.Gray{100}
-	LightGrayColor = color.Gray{150}
-	GreenColor     = color.RGBA{0, 200, 0, 255}
-	DarkGreenColor = color.RGBA{0, 100, 0, 255}
+	GrayColor        = color.Gray{100}
+	LightGrayColor   = color.Gray{150}
+	GreenColor       = color.RGBA{0, 200, 0, 255}
+	DarkGreenColor   = color.RGBA{0, 100, 0, 255}
+	TransparentColor = color.RGBA{255, 255, 255, 170}
 )
 
 const (
