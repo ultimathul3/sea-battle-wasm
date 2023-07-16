@@ -32,6 +32,8 @@ type Game struct {
 	gameButtons         []*button.Button
 	gameButtonsOffset   int
 	gameButtonsPageSize int
+
+	getGamesResponse chan network.GetGamesResponse
 }
 
 func New(cfg *config.Config) *Game {
@@ -41,6 +43,7 @@ func New(cfg *config.Config) *Game {
 		state:               state.Menu,
 		cfg:                 cfg,
 		gameButtonsPageSize: 4,
+		getGamesResponse:    make(chan network.GetGamesResponse),
 	}
 
 	g.background = background.New(g.assets.BackgroundImages, backgroundAnimationSpeed)

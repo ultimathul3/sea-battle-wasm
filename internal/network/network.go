@@ -19,22 +19,37 @@ func New(serverHost string, serverPort uint16) *Network {
 	}
 }
 
-func (n *Network) GetGames() ([]string, error) {
+func (n *Network) GetGames(ch chan<- GetGamesResponse) {
 	response, err := http.Get(fmt.Sprintf("%s:%d/games", n.serverHost, n.serverPort))
 	if err != nil {
-		return nil, err
+		ch <- GetGamesResponse{
+			Games: nil,
+			Error: err,
+		}
+		return
 	}
 	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		ch <- GetGamesResponse{
+			Games: nil,
+			Error: err,
+		}
+		return
 	}
 
 	getGames := GetGames{}
 	if err := json.Unmarshal(body, &getGames); err != nil {
-		return nil, err
+		ch <- GetGamesResponse{
+			Games: nil,
+			Error: err,
+		}
+		return
 	}
 
-	return getGames.Games, nil
+	ch <- GetGamesResponse{
+		Games: getGames.Games,
+		Error: nil,
+	}
 }

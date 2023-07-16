@@ -14,10 +14,8 @@ func (g *Game) Update() error {
 			g.state = state.CreateGame
 		})
 		g.joinGameButton.Update(func() {
-			if err := g.updateGameButtons(); err != nil {
-				g.state = state.Menu
-				return
-			}
+			g.gameButtons = nil
+			go g.network.GetGames(g.getGamesResponse)
 			g.state = state.JoinGame
 		})
 
@@ -30,6 +28,10 @@ func (g *Game) Update() error {
 		g.backButton.Update(func() {
 			g.state = state.Menu
 		})
+		if err := g.updateGameButtons(); err != nil {
+			g.state = state.Menu
+			break
+		}
 		for _, btn := range g.gameButtons {
 			btn.Update(nil)
 		}
@@ -45,9 +47,8 @@ func (g *Game) Update() error {
 		}
 		g.updateButton.Update(func() {
 			g.gameButtonsOffset = 0
-			if err := g.updateGameButtons(); err != nil {
-				g.state = state.Menu
-			}
+			g.gameButtons = nil
+			go g.network.GetGames(g.getGamesResponse)
 		})
 	}
 
@@ -55,15 +56,16 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) updateGameButtons() error {
-	g.gameButtons = nil
-
-	games, err := g.network.GetGames()
-	if err != nil {
-		return err
-	}
-
-	for _, game := range games {
-		g.gameButtons = append(g.gameButtons, button.New(g.text, g.touch, g.assets.ButtonTickPlayer, game, GrayColor, GreenColor))
+	select {
+	case r := <-g.getGamesResponse:
+		if r.Error != nil {
+			return r.Error
+		}
+		for _, game := range r.Games {
+			g.gameButtons = append(g.gameButtons, button.New(g.text, g.touch, g.assets.ButtonTickPlayer, game, GrayColor, GreenColor))
+		}
+	default:
+		return nil
 	}
 
 	return nil
