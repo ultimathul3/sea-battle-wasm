@@ -63,7 +63,9 @@ func (b *Button) Update(callback func()) {
 	isHovered := b.IsHovered()
 	if isHovered {
 		if !b.tickPlayed {
-			b.tickPlayer.Rewind()
+			if err := b.tickPlayer.Rewind(); err != nil {
+				return
+			}
 			b.tickPlayer.Play()
 			b.tickPlayed = true
 		}

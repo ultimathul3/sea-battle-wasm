@@ -18,5 +18,7 @@ func main() {
 
 	ebiten.SetWindowSize(game.WindowWidth, game.WindowHeight)
 	ebiten.SetWindowTitle(game.WindowTitle)
-	ebiten.RunGame(g)
+	if err := ebiten.RunGame(g); err != nil {
+		log.Fatal(err)
+	}
 }

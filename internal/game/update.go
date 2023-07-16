@@ -23,6 +23,7 @@ func (g *Game) Update() error {
 		g.backButton.Update(func() {
 			g.state = state.Menu
 		})
+		g.field.Update()
 
 	case state.JoinGame:
 		g.backButton.Update(func() {

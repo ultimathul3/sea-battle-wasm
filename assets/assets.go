@@ -26,19 +26,32 @@ var (
 )
 
 var (
-	//go:embed images/ships/1.png
+	//go:embed images/field/ships/1.png
 	SingleDeckShipImage []byte
-	//go:embed images/ships/2.png
+	//go:embed images/field/ships/2.png
 	DoubleDeckShipImage []byte
-	//go:embed images/ships/3.png
+	//go:embed images/field/ships/3.png
 	ThreeDeckShipImage []byte
-	//go:embed images/ships/4.png
+	//go:embed images/field/ships/4.png
 	FourDeckShipImage []byte
+)
+
+var (
+	//go:embed images/field/pick/1.png
+	SingleDeckShipPickImage []byte
+	//go:embed images/field/pick/2.png
+	DoubleDeckShipPickImage []byte
+	//go:embed images/field/pick/3.png
+	ThreeDeckShipPickImage []byte
+	//go:embed images/field/pick/4.png
+	FourDeckShipPickImage []byte
+	//go:embed images/field/pick/frame.png
+	PickFrameImage []byte
 )
 
 var (
 	//go:embed images/field/field.png
 	FieldImage []byte
-	//go:embed images/select.png
+	//go:embed images/field/select.png
 	SelectImage []byte
 )

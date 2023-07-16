@@ -52,8 +52,9 @@ func New(cfg *config.Config) *Game {
 	g.field = field.New(
 		38, 129,
 		g.assets.SingleDeckShipImage, g.assets.DoubleDeckShipImage, g.assets.ThreeDeckShipImage, g.assets.FourDeckShipImage,
+		g.assets.SingleDeckShipPickImage, g.assets.DoubleDeckShipPickImage, g.assets.ThreeDeckShipPickImage, g.assets.FourDeckShipPickImage, g.assets.PickFrameImage,
 		g.assets.FieldImage, g.assets.SelectImage,
-		TransparentColor,
+		TransparentColor, g.text, g.touch,
 	)
 
 	g.createGameButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, createGameText, GrayColor, GreenColor)

@@ -25,6 +25,12 @@ type Assets struct {
 	ThreeDeckShipImage  *ebiten.Image
 	FourDeckShipImage   *ebiten.Image
 
+	SingleDeckShipPickImage *ebiten.Image
+	DoubleDeckShipPickImage *ebiten.Image
+	ThreeDeckShipPickImage  *ebiten.Image
+	FourDeckShipPickImage   *ebiten.Image
+	PickFrameImage          *ebiten.Image
+
 	FieldImage  *ebiten.Image
 	SelectImage *ebiten.Image
 }
@@ -42,6 +48,12 @@ func New() *Assets {
 		DoubleDeckShipImage: imageFromBytes(DoubleDeckShipImage),
 		ThreeDeckShipImage:  imageFromBytes(ThreeDeckShipImage),
 		FourDeckShipImage:   imageFromBytes(FourDeckShipImage),
+
+		SingleDeckShipPickImage: imageFromBytes(SingleDeckShipPickImage),
+		DoubleDeckShipPickImage: imageFromBytes(DoubleDeckShipPickImage),
+		ThreeDeckShipPickImage:  imageFromBytes(ThreeDeckShipPickImage),
+		FourDeckShipPickImage:   imageFromBytes(FourDeckShipPickImage),
+		PickFrameImage:          imageFromBytes(PickFrameImage),
 
 		FieldImage:  imageFromBytes(FieldImage),
 		SelectImage: imageFromBytes(SelectImage),
