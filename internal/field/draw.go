@@ -13,7 +13,7 @@ func (f *Field) Draw(screen *ebiten.Image) {
 
 	for i := 1; i < FieldDimension+1; i++ {
 		for j := 1; j < FieldDimension+1; j++ {
-			switch f.FieldMatrix[i][j] {
+			switch f.fieldMatrix[i][j] {
 			case SingleDeckShipCell:
 				utils.DrawInCoordsWithColor(screen, f.singleDeckShipImage, f.getX(j), f.getY(i), f.transparentColor)
 			case DoubleDeckShipRightCell:

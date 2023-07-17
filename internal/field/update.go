@@ -23,8 +23,12 @@ func (f *Field) Update() {
 			f.selectedShip = FourDeckShipSelected
 		}
 
-		if f.isFieldHover() && f.FieldMatrix[f.i][f.j] == EmptyCell {
-			f.placeShip()
+		if f.isFieldHover() {
+			if f.fieldMatrix[f.i][f.j] == EmptyCell {
+				f.placeShip()
+			} else {
+				f.removeShip()
+			}
 		}
 	}
 
@@ -38,13 +42,121 @@ func (f *Field) Update() {
 	}
 }
 
+func (f *Field) removeShip() {
+	tmpI, tmpJ := f.i, f.j
+
+	switch f.fieldMatrix[f.i][f.j] {
+	case ShipLeftCell, ShipLeftEndCell:
+		f.j--
+		for f.fieldMatrix[f.i][f.j] == ShipLeftCell {
+			f.j--
+		}
+	case ShipUpCell, ShipUpEndCell:
+		f.i--
+		for f.fieldMatrix[f.i][f.j] == ShipUpCell {
+			f.i--
+		}
+	}
+
+	switch f.fieldMatrix[f.i][f.j] {
+	case SingleDeckShipCell:
+		f.availableSingleDeckShips++
+		f.fieldMatrix[f.i][f.j] = EmptyCell
+		f.fillLeftCells(f.i, f.j, EmptyCell)
+		f.fillRightCells(f.i, f.j, EmptyCell)
+		f.fillTopAndBottomCells(f.i, f.j, EmptyCell)
+	case DoubleDeckShipRightCell:
+		f.availableDoubleDeckShips++
+		f.removeShipRight()
+	case ThreeDeckShipRightCell:
+		f.availableThreeDeckShips++
+		f.removeShipRight()
+	case FourDeckShipRightCell:
+		f.availableFourDeckShips++
+		f.removeShipRight()
+	case DoubleDeckShipDownCell:
+		f.availableDoubleDeckShips++
+		f.removeShipDown()
+	case ThreeDeckShipDownCell:
+		f.availableThreeDeckShips++
+		f.removeShipDown()
+	case FourDeckShipDownCell:
+		f.availableFourDeckShips++
+		f.removeShipDown()
+	default:
+		return
+	}
+
+	for i := 0; i < FieldDimension+2; i++ {
+		f.fieldMatrix[0][i] = FrameCell
+		f.fieldMatrix[i][0] = FrameCell
+		f.fieldMatrix[i][FieldDimension+1] = FrameCell
+		f.fieldMatrix[FieldDimension+1][i] = FrameCell
+	}
+
+	for i := 1; i < FieldDimension+1; i++ {
+		for j := 1; j < FieldDimension+1; j++ {
+			switch f.fieldMatrix[i][j] {
+			case SingleDeckShipCell:
+				f.fillLeftCells(i, j, OccupiedCell)
+				f.fillTopAndBottomCells(i, j, OccupiedCell)
+				f.fillRightCells(i, j, OccupiedCell)
+			case DoubleDeckShipRightCell, ThreeDeckShipRightCell, FourDeckShipRightCell:
+				f.fillLeftCells(i, j, OccupiedCell)
+				f.fillTopAndBottomCells(i, j, OccupiedCell)
+			case DoubleDeckShipDownCell, ThreeDeckShipDownCell, FourDeckShipDownCell:
+				f.fillTopCells(i, j, OccupiedCell)
+				f.fillLeftAndRightCells(i, j, OccupiedCell)
+			case ShipLeftCell:
+				f.fillTopAndBottomCells(i, j, OccupiedCell)
+			case ShipUpCell:
+				f.fillLeftAndRightCells(i, j, OccupiedCell)
+			case ShipLeftEndCell:
+				f.fillTopAndBottomCells(i, j, OccupiedCell)
+				f.fillRightCells(i, j, OccupiedCell)
+			case ShipUpEndCell:
+				f.fillLeftAndRightCells(i, j, OccupiedCell)
+				f.fillBottomCells(i, j, OccupiedCell)
+			}
+		}
+	}
+
+	f.i, f.j = tmpI, tmpJ
+}
+
+func (f *Field) removeShipRight() {
+	f.fieldMatrix[f.i][f.j] = EmptyCell
+	f.fillLeftCells(f.i, f.j, EmptyCell)
+	for f.fieldMatrix[f.i][f.j] != ShipLeftEndCell {
+		f.fillTopAndBottomCells(f.i, f.j, EmptyCell)
+		f.fieldMatrix[f.i][f.j] = EmptyCell
+		f.j++
+	}
+	f.fieldMatrix[f.i][f.j] = EmptyCell
+	f.fillTopAndBottomCells(f.i, f.j, EmptyCell)
+	f.fillRightCells(f.i, f.j, EmptyCell)
+}
+
+func (f *Field) removeShipDown() {
+	f.fieldMatrix[f.i][f.j] = EmptyCell
+	f.fillTopCells(f.i, f.j, EmptyCell)
+	for f.fieldMatrix[f.i][f.j] != ShipUpEndCell {
+		f.fillLeftAndRightCells(f.i, f.j, EmptyCell)
+		f.fieldMatrix[f.i][f.j] = EmptyCell
+		f.i++
+	}
+	f.fieldMatrix[f.i][f.j] = EmptyCell
+	f.fillLeftAndRightCells(f.i, f.j, EmptyCell)
+	f.fillBottomCells(f.i, f.j, EmptyCell)
+}
+
 func (f *Field) placeShip() {
 	switch f.selectedShip {
 	case SingleDeckShipSelected:
 		if f.availableSingleDeckShips == 0 {
 			return
 		}
-		f.FieldMatrix[f.i][f.j] = SingleDeckShipCell
+		f.fieldMatrix[f.i][f.j] = SingleDeckShipCell
 		f.fillLeftCells(f.i, f.j, OccupiedCell)
 		f.fillRightCells(f.i, f.j, OccupiedCell)
 		f.fillTopAndBottomCells(f.i, f.j, OccupiedCell)
@@ -81,7 +193,7 @@ func (f *Field) placeShip() {
 
 func (f *Field) placeShipRight(shipDeck int) {
 	for i := 1; i < shipDeck; i++ {
-		if f.FieldMatrix[f.i][f.j+i] != EmptyCell {
+		if f.fieldMatrix[f.i][f.j+i] != EmptyCell {
 			return
 		}
 	}
@@ -101,15 +213,15 @@ func (f *Field) placeShipRight(shipDeck int) {
 		return
 	}
 
-	f.FieldMatrix[f.i][f.j] = ship
+	f.fieldMatrix[f.i][f.j] = ship
 	f.fillLeftCells(f.i, f.j, OccupiedCell)
 
 	for i := 0; i < shipDeck; i++ {
 		f.fillTopAndBottomCells(f.i, f.j+i, OccupiedCell)
 		if i == shipDeck-1 {
-			f.FieldMatrix[f.i][f.j+i] = ShipLeftEndCell
+			f.fieldMatrix[f.i][f.j+i] = ShipLeftEndCell
 		} else if i > 0 {
-			f.FieldMatrix[f.i][f.j+i] = ShipLeftCell
+			f.fieldMatrix[f.i][f.j+i] = ShipLeftCell
 		}
 	}
 
@@ -118,7 +230,7 @@ func (f *Field) placeShipRight(shipDeck int) {
 
 func (f *Field) placeShipDown(shipDeck int) {
 	for i := 1; i < shipDeck; i++ {
-		if f.FieldMatrix[f.i+i][f.j] != EmptyCell {
+		if f.fieldMatrix[f.i+i][f.j] != EmptyCell {
 			return
 		}
 	}
@@ -138,15 +250,15 @@ func (f *Field) placeShipDown(shipDeck int) {
 		return
 	}
 
-	f.FieldMatrix[f.i][f.j] = ship
+	f.fieldMatrix[f.i][f.j] = ship
 	f.fillTopCells(f.i, f.j, OccupiedCell)
 
 	for i := 0; i < shipDeck; i++ {
 		f.fillLeftAndRightCells(f.i+i, f.j, OccupiedCell)
 		if i == shipDeck-1 {
-			f.FieldMatrix[f.i+i][f.j] = ShipUpEndCell
+			f.fieldMatrix[f.i+i][f.j] = ShipUpEndCell
 		} else if i > 0 {
-			f.FieldMatrix[f.i+i][f.j] = ShipUpCell
+			f.fieldMatrix[f.i+i][f.j] = ShipUpCell
 		}
 	}
 
@@ -154,37 +266,37 @@ func (f *Field) placeShipDown(shipDeck int) {
 }
 
 func (f *Field) fillTopAndBottomCells(i, j int, cell rune) {
-	f.FieldMatrix[i-1][j] = cell
-	f.FieldMatrix[i+1][j] = cell
+	f.fieldMatrix[i-1][j] = cell
+	f.fieldMatrix[i+1][j] = cell
 }
 
 func (f *Field) fillLeftAndRightCells(i, j int, cell rune) {
-	f.FieldMatrix[i][j-1] = cell
-	f.FieldMatrix[i][j+1] = cell
+	f.fieldMatrix[i][j-1] = cell
+	f.fieldMatrix[i][j+1] = cell
 }
 
 func (f *Field) fillLeftCells(i, j int, cell rune) {
-	f.FieldMatrix[i-1][j-1] = cell
-	f.FieldMatrix[i][j-1] = cell
-	f.FieldMatrix[i+1][j-1] = cell
+	f.fieldMatrix[i-1][j-1] = cell
+	f.fieldMatrix[i][j-1] = cell
+	f.fieldMatrix[i+1][j-1] = cell
 }
 
 func (f *Field) fillRightCells(i, j int, cell rune) {
-	f.FieldMatrix[i-1][j+1] = cell
-	f.FieldMatrix[i][j+1] = cell
-	f.FieldMatrix[i+1][j+1] = cell
+	f.fieldMatrix[i-1][j+1] = cell
+	f.fieldMatrix[i][j+1] = cell
+	f.fieldMatrix[i+1][j+1] = cell
 }
 
 func (f *Field) fillTopCells(i, j int, cell rune) {
-	f.FieldMatrix[i-1][j-1] = cell
-	f.FieldMatrix[i-1][j] = cell
-	f.FieldMatrix[i-1][j+1] = cell
+	f.fieldMatrix[i-1][j-1] = cell
+	f.fieldMatrix[i-1][j] = cell
+	f.fieldMatrix[i-1][j+1] = cell
 }
 
 func (f *Field) fillBottomCells(i, j int, cell rune) {
-	f.FieldMatrix[i+1][j-1] = cell
-	f.FieldMatrix[i+1][j] = cell
-	f.FieldMatrix[i+1][j+1] = cell
+	f.fieldMatrix[i+1][j-1] = cell
+	f.fieldMatrix[i+1][j] = cell
+	f.fieldMatrix[i+1][j+1] = cell
 }
 
 func (f *Field) isFieldHover() bool {

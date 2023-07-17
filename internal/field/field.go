@@ -47,7 +47,7 @@ type Field struct {
 	availableThreeDeckShips  int
 	availableFourDeckShips   int
 
-	FieldMatrix [][]rune
+	fieldMatrix [][]rune
 	i, j        int
 }
 
@@ -99,7 +99,7 @@ func New(
 }
 
 func (f *Field) initFieldMatrix() {
-	f.FieldMatrix = make([][]rune, 0, FieldDimension+2)
+	f.fieldMatrix = make([][]rune, 0, FieldDimension+2)
 
 	frame := make([]rune, 0, FieldDimension+2)
 	frame2 := make([]rune, 0, FieldDimension+2)
@@ -108,15 +108,15 @@ func (f *Field) initFieldMatrix() {
 		frame2 = append(frame2, FrameCell)
 	}
 
-	f.FieldMatrix = append(f.FieldMatrix, frame)
+	f.fieldMatrix = append(f.fieldMatrix, frame)
 	for i := 1; i < FieldDimension+1; i++ {
-		f.FieldMatrix = append(f.FieldMatrix, []rune{FrameCell})
+		f.fieldMatrix = append(f.fieldMatrix, []rune{FrameCell})
 		for j := 0; j < FieldDimension; j++ {
-			f.FieldMatrix[i] = append(f.FieldMatrix[i], EmptyCell)
+			f.fieldMatrix[i] = append(f.fieldMatrix[i], EmptyCell)
 		}
-		f.FieldMatrix[i] = append(f.FieldMatrix[i], FrameCell)
+		f.fieldMatrix[i] = append(f.fieldMatrix[i], FrameCell)
 	}
-	f.FieldMatrix = append(f.FieldMatrix, frame2)
+	f.fieldMatrix = append(f.fieldMatrix, frame2)
 }
 
 func (f *Field) getX(j int) int {
