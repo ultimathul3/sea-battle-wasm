@@ -54,4 +54,6 @@ var (
 	FieldImage []byte
 	//go:embed images/field/select.png
 	SelectImage []byte
+	//go:embed images/field/arrow.png
+	ArrowImage []byte
 )

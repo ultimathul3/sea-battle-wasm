@@ -33,6 +33,7 @@ type Assets struct {
 
 	FieldImage  *ebiten.Image
 	SelectImage *ebiten.Image
+	ArrowImage  *ebiten.Image
 }
 
 func New() *Assets {
@@ -57,6 +58,7 @@ func New() *Assets {
 
 		FieldImage:  imageFromBytes(FieldImage),
 		SelectImage: imageFromBytes(SelectImage),
+		ArrowImage:  imageFromBytes(ArrowImage),
 	}
 }
 

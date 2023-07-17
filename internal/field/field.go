@@ -32,27 +32,32 @@ type Field struct {
 
 	fieldImage  *ebiten.Image
 	selectImage *ebiten.Image
+	arrowImage  *ebiten.Image
 
 	transparentColor color.Color
 
 	text  Texter
 	touch Toucher
 
-	selectedShip SelectedShip
+	selectedShip   SelectedShip
+	placeDirection PlaceDirection
 
 	availableSingleDeckShips int
 	availableDoubleDeckShips int
 	availableThreeDeckShips  int
 	availableFourDeckShips   int
+
+	FieldMatrix [][]rune
+	i, j        int
 }
 
 func New(
 	offsetX, offsetY int,
 	singleDeckShipImage, doubleDeckShipImage, threeDeckShipImage, fourDeckShipImage *ebiten.Image,
 	singleDeckShipPickImage, doubleDeckShipPickImage, threeDeckShipPickImage, fourDeckShipPickImage, pickFrameImage *ebiten.Image,
-	fieldImage *ebiten.Image, selectImage *ebiten.Image, transparentColor color.Color, text Texter, touch Toucher,
+	fieldImage *ebiten.Image, selectImage *ebiten.Image, arrowImage *ebiten.Image, transparentColor color.Color, text Texter, touch Toucher,
 ) *Field {
-	return &Field{
+	f := &Field{
 		offsetX: offsetX,
 		offsetY: offsetY,
 
@@ -72,25 +77,52 @@ func New(
 
 		fieldImage:  fieldImage,
 		selectImage: selectImage,
+		arrowImage:  arrowImage,
 
 		transparentColor: transparentColor,
 
 		text:  text,
 		touch: touch,
 
-		selectedShip: SingleDeckShipSelected,
+		selectedShip:   SingleDeckShipSelected,
+		placeDirection: RightDirection,
 
 		availableSingleDeckShips: 4,
 		availableDoubleDeckShips: 3,
 		availableThreeDeckShips:  2,
 		availableFourDeckShips:   1,
 	}
+
+	f.initFieldMatrix()
+
+	return f
 }
 
-func (f *Field) getX(i int) int {
-	return i*TileSize + f.offsetX + TileSize
+func (f *Field) initFieldMatrix() {
+	f.FieldMatrix = make([][]rune, 0, FieldDimension+2)
+
+	frame := make([]rune, 0, FieldDimension+2)
+	frame2 := make([]rune, 0, FieldDimension+2)
+	for i := 0; i < FieldDimension+2; i++ {
+		frame = append(frame, FrameCell)
+		frame2 = append(frame2, FrameCell)
+	}
+
+	f.FieldMatrix = append(f.FieldMatrix, frame)
+	for i := 1; i < FieldDimension+1; i++ {
+		f.FieldMatrix = append(f.FieldMatrix, []rune{FrameCell})
+		for j := 0; j < FieldDimension; j++ {
+			f.FieldMatrix[i] = append(f.FieldMatrix[i], EmptyCell)
+		}
+		f.FieldMatrix[i] = append(f.FieldMatrix[i], FrameCell)
+	}
+	f.FieldMatrix = append(f.FieldMatrix, frame2)
 }
 
-func (f *Field) getY(j int) int {
-	return j*TileSize + f.offsetY + TileSize
+func (f *Field) getX(j int) int {
+	return (j-1)*TileSize + f.offsetX + TileSize
+}
+
+func (f *Field) getY(i int) int {
+	return (i-1)*TileSize + f.offsetY + TileSize
 }

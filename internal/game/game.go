@@ -53,7 +53,7 @@ func New(cfg *config.Config) *Game {
 		38, 129,
 		g.assets.SingleDeckShipImage, g.assets.DoubleDeckShipImage, g.assets.ThreeDeckShipImage, g.assets.FourDeckShipImage,
 		g.assets.SingleDeckShipPickImage, g.assets.DoubleDeckShipPickImage, g.assets.ThreeDeckShipPickImage, g.assets.FourDeckShipPickImage, g.assets.PickFrameImage,
-		g.assets.FieldImage, g.assets.SelectImage,
+		g.assets.FieldImage, g.assets.SelectImage, g.assets.ArrowImage,
 		TransparentColor, g.text, g.touch,
 	)
 
