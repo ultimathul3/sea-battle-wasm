@@ -6,14 +6,16 @@ type HttpServer struct {
 }
 
 type Config struct {
-	HttpServer HttpServer
+	HttpServer          HttpServer
+	DevelopmentNickname string
 }
 
 func New() *Config {
 	return &Config{
 		HttpServer{
-			Host: "localhost",
-			Port: 8080,
+			Host: "http://localhost",
+			Port: 8082,
 		},
+		"test",
 	}
 }

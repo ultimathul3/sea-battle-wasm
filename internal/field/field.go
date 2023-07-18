@@ -76,6 +76,27 @@ func New(
 	return f
 }
 
+func (f *Field) GetNumOfAvailableShips() int {
+	return f.availableSingleDeckShips +
+		f.availableDoubleDeckShips +
+		f.availableThreeDeckShips +
+		f.availableFourDeckShips
+}
+
+func (f *Field) SetState(state FieldState) {
+	f.state = state
+}
+
+func (f *Field) ConvertFieldRuneMatrixToString() string {
+	var field string
+
+	for i := 1; i < FieldDimension+1; i++ {
+		field += string(f.fieldMatrix[i][1 : FieldDimension+1])
+	}
+
+	return field
+}
+
 func (f *Field) initFieldMatrix() {
 	f.fieldMatrix = make([][]rune, 0, FieldDimension+2)
 
@@ -103,4 +124,42 @@ func (f *Field) getX(j int) int {
 
 func (f *Field) getY(i int) int {
 	return (i-1)*TileSize + f.offsetY + TileSize
+}
+
+func (f *Field) fillTopAndBottomCells(i, j int, cell rune) {
+	f.fieldMatrix[i-1][j] = cell
+	f.fieldMatrix[i+1][j] = cell
+}
+
+func (f *Field) fillLeftAndRightCells(i, j int, cell rune) {
+	f.fieldMatrix[i][j-1] = cell
+	f.fieldMatrix[i][j+1] = cell
+}
+
+func (f *Field) fillLeftCells(i, j int, cell rune) {
+	f.fieldMatrix[i-1][j-1] = cell
+	f.fieldMatrix[i][j-1] = cell
+	f.fieldMatrix[i+1][j-1] = cell
+}
+
+func (f *Field) fillRightCells(i, j int, cell rune) {
+	f.fieldMatrix[i-1][j+1] = cell
+	f.fieldMatrix[i][j+1] = cell
+	f.fieldMatrix[i+1][j+1] = cell
+}
+
+func (f *Field) fillTopCells(i, j int, cell rune) {
+	f.fieldMatrix[i-1][j-1] = cell
+	f.fieldMatrix[i-1][j] = cell
+	f.fieldMatrix[i-1][j+1] = cell
+}
+
+func (f *Field) fillBottomCells(i, j int, cell rune) {
+	f.fieldMatrix[i+1][j-1] = cell
+	f.fieldMatrix[i+1][j] = cell
+	f.fieldMatrix[i+1][j+1] = cell
+}
+
+func (f *Field) isFieldHover(x, y int) bool {
+	return x >= f.offsetX+32 && x < f.offsetX+341 && y >= f.offsetY+32 && y < f.offsetY+341
 }

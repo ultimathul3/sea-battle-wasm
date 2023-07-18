@@ -15,6 +15,7 @@ const (
 	leftArrowButtonText  = "<"
 	rightArrowButtonText = ">"
 	updateButtonText     = "Обновить"
+	startButtonText      = "Начать"
 )
 
 var (

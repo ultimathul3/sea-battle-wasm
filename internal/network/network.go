@@ -1,6 +1,7 @@
 package network
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -51,5 +52,53 @@ func (n *Network) GetGames(ch chan<- GetGamesResponse) {
 	ch <- GetGamesResponse{
 		Games: getGames.Games,
 		Error: nil,
+	}
+}
+
+func (n *Network) CreateGame(input CreateGameRequest, ch chan<- CreateGameResponse) {
+	body, err := json.Marshal(input)
+	if err != nil {
+		ch <- CreateGameResponse{
+			HostUuid: "",
+			Error:    err,
+		}
+		return
+	}
+
+	response, err := http.Post(
+		fmt.Sprintf("%s:%d/games", n.serverHost, n.serverPort),
+		"application/json",
+		bytes.NewReader(body),
+	)
+	if err != nil {
+		ch <- CreateGameResponse{
+			HostUuid: "",
+			Error:    err,
+		}
+		return
+	}
+	defer response.Body.Close()
+
+	body, err = io.ReadAll(response.Body)
+	if err != nil {
+		ch <- CreateGameResponse{
+			HostUuid: "",
+			Error:    err,
+		}
+		return
+	}
+
+	createGame := CreateGame{}
+	if err := json.Unmarshal(body, &createGame); err != nil {
+		ch <- CreateGameResponse{
+			HostUuid: "",
+			Error:    err,
+		}
+		return
+	}
+
+	ch <- CreateGameResponse{
+		HostUuid: createGame.HostUuid,
+		Error:    nil,
 	}
 }
