@@ -20,7 +20,9 @@ type Game struct {
 	state      state.State
 	cfg        *config.Config
 	network    *network.Network
-	field      *field.Field
+
+	field         *field.Field
+	opponentField *field.Field
 
 	createGameButton *button.Button
 	joinGameButton   *button.Button
@@ -51,10 +53,16 @@ func New(cfg *config.Config) *Game {
 	g.network = network.New(g.cfg.HttpServer.Host, g.cfg.HttpServer.Port)
 	g.field = field.New(
 		38, 129,
-		g.assets.SingleDeckShipImage, g.assets.DoubleDeckShipImage, g.assets.ThreeDeckShipImage, g.assets.FourDeckShipImage,
-		g.assets.SingleDeckShipPickImage, g.assets.DoubleDeckShipPickImage, g.assets.ThreeDeckShipPickImage, g.assets.FourDeckShipPickImage, g.assets.PickFrameImage,
-		g.assets.FieldImage, g.assets.SelectImage, g.assets.ArrowImage,
+		g.assets,
 		TransparentColor, g.text, g.touch,
+		field.PlacementState,
+	)
+
+	g.opponentField = field.New(
+		418, 129,
+		g.assets,
+		TransparentColor, g.text, g.touch,
+		field.CurtainState,
 	)
 
 	g.createGameButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, createGameText, GrayColor, GreenColor)

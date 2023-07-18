@@ -16,6 +16,13 @@ func (f *Field) Update() {
 	f.i = (my-f.offsetY-TileSize)/TileSize + 1
 	f.j = (mx-f.offsetX-TileSize)/TileSize + 1
 
+	switch f.state {
+	case PlacementState:
+		f.updatePlacementState(tx, ty, mx, my, isTouched)
+	}
+}
+
+func (f *Field) updatePlacementState(tx, ty, mx, my int, isTouched bool) {
 	if isTouched {
 		if tx >= f.pickFrameOffsetX+212 && tx <= f.pickFrameOffsetX+212+32 && ty >= f.pickFrameOffsetY+62 && ty <= f.pickFrameOffsetY+62+32 {
 			f.selectedShip = SingleDeckShipSelected

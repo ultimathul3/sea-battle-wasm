@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/ultimathul3/sea-battle-wasm/internal/button"
+	"github.com/ultimathul3/sea-battle-wasm/internal/field"
 	"github.com/ultimathul3/sea-battle-wasm/internal/state"
 )
 
@@ -12,6 +13,11 @@ func (g *Game) Update() error {
 	case state.Menu:
 		g.createGameButton.Update(func() {
 			g.state = state.CreateGame
+			g.field = field.New(
+				38, 129,
+				g.assets, TransparentColor, g.text, g.touch,
+				field.PlacementState,
+			)
 		})
 		g.joinGameButton.Update(func() {
 			g.gameButtons = nil

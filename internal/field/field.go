@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/ultimathul3/sea-battle-wasm/assets"
 )
 
 type Texter interface {
@@ -19,20 +20,7 @@ type Field struct {
 
 	pickFrameOffsetX, pickFrameOffsetY int
 
-	singleDeckShipImage *ebiten.Image
-	doubleDeckShipImage *ebiten.Image
-	threeDeckShipImage  *ebiten.Image
-	fourDeckShipImage   *ebiten.Image
-
-	singleDeckShipPickImage *ebiten.Image
-	doubleDeckShipPickImage *ebiten.Image
-	threeDeckShipPickImage  *ebiten.Image
-	fourDeckShipPickImage   *ebiten.Image
-	pickFrameImage          *ebiten.Image
-
-	fieldImage  *ebiten.Image
-	selectImage *ebiten.Image
-	arrowImage  *ebiten.Image
+	assets *assets.Assets
 
 	transparentColor color.Color
 
@@ -49,13 +37,14 @@ type Field struct {
 
 	fieldMatrix [][]rune
 	i, j        int
+
+	state FieldState
 }
 
 func New(
 	offsetX, offsetY int,
-	singleDeckShipImage, doubleDeckShipImage, threeDeckShipImage, fourDeckShipImage *ebiten.Image,
-	singleDeckShipPickImage, doubleDeckShipPickImage, threeDeckShipPickImage, fourDeckShipPickImage, pickFrameImage *ebiten.Image,
-	fieldImage *ebiten.Image, selectImage *ebiten.Image, arrowImage *ebiten.Image, transparentColor color.Color, text Texter, touch Toucher,
+	assets *assets.Assets, transparentColor color.Color, text Texter, touch Toucher,
+	state FieldState,
 ) *Field {
 	f := &Field{
 		offsetX: offsetX,
@@ -64,20 +53,7 @@ func New(
 		pickFrameOffsetX: offsetX,
 		pickFrameOffsetY: offsetY + 350,
 
-		singleDeckShipImage: singleDeckShipImage,
-		doubleDeckShipImage: doubleDeckShipImage,
-		threeDeckShipImage:  threeDeckShipImage,
-		fourDeckShipImage:   fourDeckShipImage,
-
-		singleDeckShipPickImage: singleDeckShipPickImage,
-		doubleDeckShipPickImage: doubleDeckShipPickImage,
-		threeDeckShipPickImage:  threeDeckShipPickImage,
-		fourDeckShipPickImage:   fourDeckShipPickImage,
-		pickFrameImage:          pickFrameImage,
-
-		fieldImage:  fieldImage,
-		selectImage: selectImage,
-		arrowImage:  arrowImage,
+		assets: assets,
 
 		transparentColor: transparentColor,
 
@@ -91,6 +67,8 @@ func New(
 		availableDoubleDeckShips: 3,
 		availableThreeDeckShips:  2,
 		availableFourDeckShips:   1,
+
+		state: state,
 	}
 
 	f.initFieldMatrix()
