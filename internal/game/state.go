@@ -6,5 +6,9 @@ const (
 	MenuState GameState = iota
 	CreateGameState
 	JoinGameState
+	JoinPlacementState
 	GameCreatedState
+	OpponentGameStartedState
+	HostWaitOpponentState
+	HostGameStartedState
 )

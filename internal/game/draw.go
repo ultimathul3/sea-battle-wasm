@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -17,6 +18,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.drawCreateGameState(screen)
 	case JoinGameState:
 		g.drawJoinGameState(screen)
+	case GameCreatedState:
+		g.drawGameCreatedState(screen)
+	case JoinPlacementState:
+		g.drawJoinPlacementState(screen)
+	case OpponentGameStartedState:
+		g.drawOpponentGameStartedState(screen)
+	case HostWaitOpponentState:
+		g.drawHostWaitOpponentState(screen)
+	case HostGameStartedState:
+		g.drawHostGameStartedState(screen)
 	}
 }
 
@@ -60,6 +71,59 @@ func (g *Game) drawJoinGameState(screen *ebiten.Image) {
 	}
 
 	g.updateButton.Draw(screen, 340, 100)
+}
+
+func (g *Game) drawGameCreatedState(screen *ebiten.Image) {
+	g.backButton.Draw(screen, 9, 9)
+
+	g.field.Draw(screen)
+	g.opponentField.Draw(screen)
+
+	g.text.DrawMedium(screen, "Ожидание игрока...", 240, 9, color.White)
+}
+
+func (g *Game) drawJoinPlacementState(screen *ebiten.Image) {
+	g.backButton.Draw(screen, 9, 9)
+
+	g.field.Draw(screen)
+	g.opponentField.Draw(screen)
+
+	if g.field.GetNumOfAvailableShips() == 0 {
+		g.startButton.Draw(screen, 529, 519)
+	}
+}
+
+func (g *Game) drawOpponentGameStartedState(screen *ebiten.Image) {
+	g.backButton.Draw(screen, 9, 9)
+
+	g.field.Draw(screen)
+	g.opponentField.Draw(screen)
+
+	g.text.DrawMedium(screen,
+		fmt.Sprintf("Ход игрока %s", g.nickname),
+		160, 9, color.White,
+	)
+}
+
+func (g *Game) drawHostWaitOpponentState(screen *ebiten.Image) {
+	g.backButton.Draw(screen, 9, 9)
+
+	g.field.Draw(screen)
+	g.opponentField.Draw(screen)
+
+	g.text.DrawMedium(screen,
+		fmt.Sprintf("Ожидание игрока %s...", g.opponentNickname),
+		160, 9, color.White,
+	)
+}
+
+func (g *Game) drawHostGameStartedState(screen *ebiten.Image) {
+	g.backButton.Draw(screen, 9, 9)
+
+	g.field.Draw(screen)
+	g.opponentField.Draw(screen)
+
+	g.text.DrawMedium(screen, "Ваш ход", 260, 9, color.White)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

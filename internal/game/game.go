@@ -39,8 +39,14 @@ type Game struct {
 
 	getGamesResponse   chan network.GetGamesResponse
 	createGameResponse chan network.CreateGameResponse
+	joinGameResponse   chan network.JoinGameResponse
+	startGameResponse  chan network.StartGameResponse
+	waitResponse       chan network.WaitResponse
 
-	nickname string
+	nickname         string
+	opponentNickname string
+	hostUuid         string
+	opponentUuid     string
 }
 
 func New(cfg *config.Config) *Game {
@@ -50,26 +56,11 @@ func New(cfg *config.Config) *Game {
 		state:               MenuState,
 		cfg:                 cfg,
 		gameButtonsPageSize: 4,
-		getGamesResponse:    make(chan network.GetGamesResponse),
 	}
 
 	g.background = background.New(g.assets.BackgroundImages, backgroundAnimationSpeed)
 	g.text = text.New(g.assets.LargeFont, g.assets.MediumFont, yLargeFontOffset, yMediumFontOffset)
 	g.network = network.New(g.cfg.HttpServer.Host, g.cfg.HttpServer.Port)
-
-	g.field = field.New(
-		38, 129,
-		g.assets,
-		TransparentColor, g.text, g.touch,
-		field.PlacementState,
-	)
-
-	g.opponentField = field.New(
-		418, 129,
-		g.assets,
-		TransparentColor, g.text, g.touch,
-		field.CurtainState,
-	)
 
 	if len(os.Args) < 2 {
 		g.nickname = g.cfg.DevelopmentNickname
@@ -86,4 +77,25 @@ func New(cfg *config.Config) *Game {
 	g.startButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, startButtonText, LightGrayColor, DarkGreenColor)
 
 	return g
+}
+
+func (g *Game) resetGame() {
+	g.field = field.New(
+		38, 129,
+		g.assets, TransparentColor, g.text, g.touch,
+		field.PlacementState,
+	)
+
+	g.opponentField = field.New(
+		418, 129,
+		g.assets,
+		TransparentColor, g.text, g.touch,
+		field.CurtainState,
+	)
+
+	g.getGamesResponse = make(chan network.GetGamesResponse)
+	g.createGameResponse = make(chan network.CreateGameResponse)
+	g.joinGameResponse = make(chan network.JoinGameResponse)
+	g.startGameResponse = make(chan network.StartGameResponse)
+	g.waitResponse = make(chan network.WaitResponse)
 }
