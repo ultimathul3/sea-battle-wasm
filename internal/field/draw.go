@@ -39,7 +39,8 @@ func (f *Field) Draw(screen *ebiten.Image) {
 		utils.DrawInCoordsWithColorAndRotate(screen, f.arrowImage, f.offsetX+8, f.offsetY+30, f.transparentColor, 3*math.Pi/2)
 	}
 
-	if f.isFieldHover() {
+	mx, my := ebiten.CursorPosition()
+	if f.isFieldHover(mx, my) {
 		utils.DrawInCoordsWithColor(screen, f.selectImage, f.getX(f.j), f.getY(f.i), f.transparentColor)
 	}
 

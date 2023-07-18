@@ -9,6 +9,10 @@ func (f *Field) Update() {
 	tx, ty, isTouched := f.touch.IsTouched()
 
 	mx, my := ebiten.CursorPosition()
+	if isTouched {
+		mx, my = tx, ty
+	}
+
 	f.i = (my-f.offsetY-TileSize)/TileSize + 1
 	f.j = (mx-f.offsetX-TileSize)/TileSize + 1
 
@@ -23,7 +27,7 @@ func (f *Field) Update() {
 			f.selectedShip = FourDeckShipSelected
 		}
 
-		if f.isFieldHover() {
+		if f.isFieldHover(mx, my) {
 			if f.fieldMatrix[f.i][f.j] == EmptyCell {
 				f.placeShip()
 			} else {
@@ -299,7 +303,6 @@ func (f *Field) fillBottomCells(i, j int, cell rune) {
 	f.fieldMatrix[i+1][j+1] = cell
 }
 
-func (f *Field) isFieldHover() bool {
-	mx, my := ebiten.CursorPosition()
-	return mx >= f.offsetX+32 && mx < f.offsetX+341 && my >= f.offsetY+32 && my < f.offsetY+341
+func (f *Field) isFieldHover(x, y int) bool {
+	return x >= f.offsetX+32 && x < f.offsetX+341 && y >= f.offsetY+32 && y < f.offsetY+341
 }
