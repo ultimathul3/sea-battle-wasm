@@ -1,24 +1,19 @@
 package config
 
-import (
-	"github.com/ilyakaznacheev/cleanenv"
-)
-
-const (
-	EnvFilePath = ".env"
-)
-
-type Config struct {
-	HttpServer struct {
-		Host string `env:"HTTP_SERVER_HOST"`
-		Port uint16 `env:"HTTP_SERVER_PORT"`
-	}
+type HttpServer struct {
+	Host string
+	Port uint16
 }
 
-func ReadEnvFile() (*Config, error) {
-	var cfg Config
+type Config struct {
+	HttpServer HttpServer
+}
 
-	err := cleanenv.ReadConfig(EnvFilePath, &cfg)
-
-	return &cfg, err
+func New() *Config {
+	return &Config{
+		HttpServer{
+			Host: "localhost",
+			Port: 8080,
+		},
+	}
 }

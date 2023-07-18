@@ -9,10 +9,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.ReadEnvFile()
-	if err != nil {
-		log.Fatal(err)
-	}
+	cfg := config.New()
 
 	g := game.New(cfg)
 
