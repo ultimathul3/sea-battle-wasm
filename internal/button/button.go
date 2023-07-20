@@ -14,6 +14,7 @@ const (
 
 type Texter interface {
 	DrawMedium(screen *ebiten.Image, text string, x, y int, color color.Color)
+	DrawMediumInCenter(screen *ebiten.Image, text string, y int, color color.Color) int
 }
 
 type Toucher interface {
@@ -79,6 +80,11 @@ func (b *Button) Update(callback func()) {
 func (b *Button) Draw(screen *ebiten.Image, x, y int) {
 	b.x, b.y = x, y
 	b.texter.DrawMedium(screen, b.Label, x, y, b.currentColor)
+}
+
+func (b *Button) DrawInCenter(screen *ebiten.Image, y int) {
+	b.y = y
+	b.x = b.texter.DrawMediumInCenter(screen, b.Label, y, b.currentColor)
 }
 
 func (b *Button) IsHovered() bool {

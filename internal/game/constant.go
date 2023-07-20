@@ -16,6 +16,10 @@ const (
 	rightArrowButtonText = ">"
 	updateButtonText     = "Обновить"
 	startButtonText      = "Начать"
+	PlayerWaitingText    = "Ожидание игрока..."
+	YourTurnText         = "Ваш ход"
+	PlayerTurnTextFmt    = "Ход игрока %s"
+	PlayerWaitingTextFmt = "Ожидание игрока %s..."
 )
 
 type Turn int
@@ -38,6 +42,8 @@ const (
 )
 
 const (
-	yLargeFontOffset  = 63
-	yMediumFontOffset = 28
+	yLargeFontOffset            = 63
+	yMediumFontOffset           = 28
+	yMediumFontCharWidth        = 16
+	yMediumFontSizeBetweenChars = 4
 )

@@ -63,7 +63,7 @@ func New(cfg *config.Config) *Game {
 	}
 
 	g.background = background.New(g.assets.BackgroundImages, backgroundAnimationSpeed)
-	g.text = text.New(g.assets.LargeFont, g.assets.MediumFont, yLargeFontOffset, yMediumFontOffset)
+	g.text = text.New(g.assets.LargeFont, g.assets.MediumFont, yLargeFontOffset, yMediumFontOffset, yMediumFontCharWidth, yMediumFontSizeBetweenChars)
 	g.network = network.New(g.cfg.HttpServer.Host, g.cfg.HttpServer.Port)
 
 	if len(os.Args) < 2 {

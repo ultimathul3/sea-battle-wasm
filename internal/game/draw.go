@@ -58,7 +58,7 @@ func (g *Game) drawJoinGameState(screen *ebiten.Image) {
 	}
 
 	for i, btn := range g.gameButtons[from:to] {
-		btn.Draw(screen, 350, 200+i*button.ButtonHeight)
+		btn.DrawInCenter(screen, 200+i*button.ButtonHeight)
 	}
 
 	if len(g.gameButtons) > g.gameButtonsPageSize {
@@ -70,7 +70,7 @@ func (g *Game) drawJoinGameState(screen *ebiten.Image) {
 		}
 	}
 
-	g.updateButton.Draw(screen, 320, 100)
+	g.updateButton.DrawInCenter(screen, 100)
 }
 
 func (g *Game) drawGameCreatedState(screen *ebiten.Image) {
@@ -79,7 +79,7 @@ func (g *Game) drawGameCreatedState(screen *ebiten.Image) {
 	g.field.Draw(screen)
 	g.opponentField.Draw(screen)
 
-	g.text.DrawMedium(screen, "Ожидание игрока...", 240, 9, color.White)
+	g.text.DrawMediumInCenter(screen, PlayerWaitingText, 9, color.White)
 }
 
 func (g *Game) drawJoinPlacementState(screen *ebiten.Image) {
@@ -100,12 +100,9 @@ func (g *Game) drawOpponentGameStartedState(screen *ebiten.Image) {
 	g.opponentField.Draw(screen)
 
 	if g.turn == OpponentTurn {
-		g.text.DrawMedium(screen, "Ваш ход", 333, 9, color.White)
+		g.text.DrawMediumInCenter(screen, YourTurnText, 9, color.White)
 	} else {
-		g.text.DrawMedium(screen,
-			fmt.Sprintf("Ход игрока %s", g.nickname),
-			220, 9, color.White,
-		)
+		g.text.DrawMediumInCenter(screen, fmt.Sprintf(PlayerTurnTextFmt, g.nickname), 9, color.White)
 	}
 }
 
@@ -115,9 +112,9 @@ func (g *Game) drawHostWaitOpponentState(screen *ebiten.Image) {
 	g.field.Draw(screen)
 	g.opponentField.Draw(screen)
 
-	g.text.DrawMedium(screen,
-		fmt.Sprintf("Ожидание игрока %s...", g.opponentNickname),
-		160, 9, color.White,
+	g.text.DrawMediumInCenter(screen,
+		fmt.Sprintf(PlayerWaitingTextFmt, g.opponentNickname),
+		9, color.White,
 	)
 }
 
@@ -128,12 +125,9 @@ func (g *Game) drawHostGameStartedState(screen *ebiten.Image) {
 	g.opponentField.Draw(screen)
 
 	if g.turn == HostTurn {
-		g.text.DrawMedium(screen, "Ваш ход", 333, 9, color.White)
+		g.text.DrawMediumInCenter(screen, YourTurnText, 9, color.White)
 	} else {
-		g.text.DrawMedium(screen,
-			fmt.Sprintf("Ход игрока %s", g.nickname),
-			220, 9, color.White,
-		)
+		g.text.DrawMediumInCenter(screen, fmt.Sprintf(PlayerTurnTextFmt, g.nickname), 9, color.White)
 	}
 }
 
