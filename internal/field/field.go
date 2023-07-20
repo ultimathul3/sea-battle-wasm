@@ -161,5 +161,5 @@ func (f *Field) fillBottomCells(i, j int, cell rune) {
 }
 
 func (f *Field) isFieldHover(x, y int) bool {
-	return x >= f.offsetX+32 && x < f.offsetX+341 && y >= f.offsetY+32 && y < f.offsetY+341
+	return x >= f.offsetX+TileSize+1 && x < f.offsetX+341 && y >= f.offsetY+TileSize+1 && y < f.offsetY+341
 }

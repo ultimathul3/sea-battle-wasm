@@ -74,10 +74,12 @@ func (g *Game) updateJoinGameState() {
 		g.state = MenuState
 	})
 
-	if err := g.updateGetGamesResponse(); err != nil {
-		log.Println(err)
-		g.state = MenuState
-		return
+	if r, err := g.updateGetGamesResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		for _, game := range r.Games {
+			g.gameButtons = append(g.gameButtons, button.New(g.text, g.touch, g.assets.ButtonTickPlayer, game, GrayColor, GreenColor))
+		}
 	}
 
 	for _, btn := range g.gameButtons {
@@ -115,16 +117,21 @@ func (g *Game) updateGameCreatedState() {
 		g.state = MenuState
 	})
 
-	if err := g.updateCreateGameResponse(); err != nil {
-		log.Println(err)
-		g.state = MenuState
-		return
+	if r, err := g.updateCreateGameResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		g.hostUuid = r.HostUuid
+		go g.network.Wait(network.WaitRequest{Uuid: g.hostUuid}, g.waitResponse)
 	}
 
-	if err := g.updateWaitResponse(); err != nil {
-		log.Println(err)
-		g.state = MenuState
-		return
+	if r, err := g.updateWaitResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		if r.Status == network.WaitingForOpponentStatus {
+			g.state = HostWaitOpponentState
+			g.opponentNickname = r.Message
+			go g.network.Wait(network.WaitRequest{Uuid: g.hostUuid}, g.waitResponse)
+		}
 	}
 }
 
@@ -135,16 +142,10 @@ func (g *Game) updateJoinPlacementState() {
 
 	g.field.Update()
 
-	if err := g.updateJoinGameResponse(); err != nil {
-		log.Println(err)
-		g.state = MenuState
-		return
-	}
-
-	if err := g.updateStartGameResponse(); err != nil {
-		log.Println(err)
-		g.state = MenuState
-		return
+	if r, err := g.updateJoinGameResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		g.opponentUuid = r.OpponentUuid
 	}
 
 	if g.field.GetNumOfAvailableShips() == 0 {
@@ -158,12 +159,54 @@ func (g *Game) updateJoinPlacementState() {
 			}, g.startGameResponse)
 		})
 	}
+
+	if r, err := g.updateStartGameResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		g.state = OpponentGameStartedState
+		g.opponentField.SetState(field.ShootState)
+		go g.network.Wait(network.WaitRequest{Uuid: g.opponentUuid}, g.waitResponse)
+	}
 }
 
 func (g *Game) updateOpponentGameStartedState() {
 	g.backButton.Update(func() {
 		g.state = MenuState
 	})
+
+	g.field.Update()
+	g.opponentField.Update()
+
+	x, y, isTouched := g.opponentField.IsEmptyCellTouched()
+	if isTouched && g.turn == OpponentTurn {
+		g.lastX = x
+		g.lastY = y
+		go g.network.Shoot(network.ShootRequest{
+			HostNickname: g.nickname,
+			X:            uint32(x),
+			Y:            uint32(y),
+			Uuid:         g.opponentUuid,
+		}, g.shootResponse)
+		go g.network.Wait(network.WaitRequest{Uuid: g.opponentUuid}, g.waitResponse)
+	}
+
+	if r, err := g.updateShootResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		g.turn = HostTurn
+		if r.Status == network.OpponentMissStatus {
+			g.opponentField.SetMissCell(g.lastX, g.lastY)
+		}
+	}
+
+	if r, err := g.updateWaitResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		g.turn = OpponentTurn
+		if r.Status == network.HostMissStatus {
+			g.field.SetMissCell(int(r.X), int(r.Y))
+		}
+	}
 }
 
 func (g *Game) updateHostWaitOpponentState() {
@@ -171,104 +214,132 @@ func (g *Game) updateHostWaitOpponentState() {
 		g.state = MenuState
 	})
 
-	if err := g.updateWaitResponse(); err != nil {
-		log.Println(err)
-		g.state = MenuState
-		return
+	if r, err := g.updateWaitResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		if r.Status == network.GameStartedStatus {
+			g.state = HostGameStartedState
+			g.opponentField.SetState(field.ShootState)
+		}
 	}
+
+	g.field.Update()
+	g.opponentField.Update()
 }
 
 func (g *Game) updateHostGameStartedState() {
 	g.backButton.Update(func() {
 		g.state = MenuState
 	})
+
+	g.field.Update()
+	g.opponentField.Update()
+
+	x, y, isTouched := g.opponentField.IsEmptyCellTouched()
+	if isTouched && g.turn == HostTurn {
+		g.lastX = x
+		g.lastY = y
+		go g.network.Shoot(network.ShootRequest{
+			HostNickname: g.nickname,
+			X:            uint32(x),
+			Y:            uint32(y),
+			Uuid:         g.hostUuid,
+		}, g.shootResponse)
+		go g.network.Wait(network.WaitRequest{Uuid: g.hostUuid}, g.waitResponse)
+	}
+
+	if r, err := g.updateShootResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		g.turn = OpponentTurn
+		if r.Status == network.HostMissStatus {
+			g.opponentField.SetMissCell(g.lastX, g.lastY)
+		}
+	}
+
+	if r, err := g.updateWaitResponse(); err != nil {
+		g.handleErrorResponse(err)
+	} else if r != nil {
+		g.turn = HostTurn
+		if r.Status == network.OpponentMissStatus {
+			g.field.SetMissCell(int(r.X), int(r.Y))
+		}
+	}
 }
 
-func (g *Game) updateWaitResponse() error {
+func (g *Game) handleErrorResponse(err error) {
+	log.Println(err)
+	g.state = MenuState
+}
+
+func (g *Game) updateShootResponse() (*network.ShootResponse, error) {
+	select {
+	case r := <-g.shootResponse:
+		if r.Error != nil {
+			return nil, r.Error
+		}
+		return &r, nil
+	default:
+		return nil, nil
+	}
+}
+
+func (g *Game) updateWaitResponse() (*network.WaitResponse, error) {
 	select {
 	case r := <-g.waitResponse:
 		if r.Error != nil {
-			return r.Error
+			return nil, r.Error
 		}
-
-		switch g.state {
-		case GameCreatedState:
-			if r.Status == network.WaitingForOpponentStatus {
-				g.state = HostWaitOpponentState
-				g.opponentNickname = r.Message
-				go g.network.Wait(network.WaitRequest{
-					Uuid: g.hostUuid,
-				}, g.waitResponse)
-			}
-		case HostWaitOpponentState:
-			if r.Status == network.GameStartedStatus {
-				g.state = HostGameStartedState
-			}
-		}
+		return &r, nil
 	default:
-		return nil
+		return nil, nil
 	}
-
-	return nil
 }
 
-func (g *Game) updateStartGameResponse() error {
+func (g *Game) updateStartGameResponse() (*network.StartGameResponse, error) {
 	select {
 	case r := <-g.startGameResponse:
 		if r.Error != nil {
-			return r.Error
+			return nil, r.Error
 		}
-		g.state = OpponentGameStartedState
+		return &r, nil
 	default:
-		return nil
+		return nil, nil
 	}
-
-	return nil
 }
 
-func (g *Game) updateJoinGameResponse() error {
+func (g *Game) updateJoinGameResponse() (*network.JoinGameResponse, error) {
 	select {
 	case r := <-g.joinGameResponse:
 		if r.Error != nil {
-			return r.Error
+			return nil, r.Error
 		}
-		g.opponentUuid = r.OpponentUuid
+		return &r, nil
 	default:
-		return nil
+		return nil, nil
 	}
-
-	return nil
 }
 
-func (g *Game) updateCreateGameResponse() error {
+func (g *Game) updateCreateGameResponse() (*network.CreateGameResponse, error) {
 	select {
 	case r := <-g.createGameResponse:
 		if r.Error != nil {
-			return r.Error
+			return nil, r.Error
 		}
-		g.hostUuid = r.HostUuid
-		go g.network.Wait(network.WaitRequest{
-			Uuid: r.HostUuid,
-		}, g.waitResponse)
+		return &r, nil
 	default:
-		return nil
+		return nil, nil
 	}
-
-	return nil
 }
 
-func (g *Game) updateGetGamesResponse() error {
+func (g *Game) updateGetGamesResponse() (*network.GetGamesResponse, error) {
 	select {
 	case r := <-g.getGamesResponse:
 		if r.Error != nil {
-			return r.Error
+			return nil, r.Error
 		}
-		for _, game := range r.Games {
-			g.gameButtons = append(g.gameButtons, button.New(g.text, g.touch, g.assets.ButtonTickPlayer, game, GrayColor, GreenColor))
-		}
+		return &r, nil
 	default:
-		return nil
+		return nil, nil
 	}
-
-	return nil
 }

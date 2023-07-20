@@ -18,6 +18,13 @@ const (
 	startButtonText      = "Начать"
 )
 
+type Turn int
+
+const (
+	HostTurn Turn = iota
+	OpponentTurn
+)
+
 var (
 	GrayColor        = color.Gray{100}
 	LightGrayColor   = color.Gray{150}

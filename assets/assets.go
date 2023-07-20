@@ -59,3 +59,8 @@ var (
 	//go:embed images/field/curtain.png
 	CurtainImage []byte
 )
+
+var (
+	//go:embed images/field/miss.png
+	MissImage []byte
+)

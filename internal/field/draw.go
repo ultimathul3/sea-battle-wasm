@@ -28,6 +28,8 @@ func (f *Field) Draw(screen *ebiten.Image) {
 				utils.DrawInCoordsWithColorAndRotate(screen, f.assets.FourDeckShipImage, f.getX(j), f.getY(i)+32, f.transparentColor, -math.Pi/2)
 			case FourDeckShipDownCell:
 				utils.DrawInCoordsWithColorAndRotate(screen, f.assets.FourDeckShipImage, f.getX(j)+32, f.getY(i)+125, f.transparentColor, math.Pi)
+			case MissCell:
+				utils.DrawInCoordsWithColor(screen, f.assets.MissImage, f.getX(j)+1, f.getY(i)+1, f.transparentColor)
 			}
 		}
 	}
@@ -37,6 +39,8 @@ func (f *Field) Draw(screen *ebiten.Image) {
 		f.drawPlacementState(screen)
 	case CurtainState:
 		f.drawCurtainState(screen)
+	case ShootState:
+		f.drawShootState(screen)
 	}
 }
 
@@ -74,4 +78,11 @@ func (f *Field) drawPlacementState(screen *ebiten.Image) {
 	f.text.DrawMedium(screen, fmt.Sprintf("x%d", f.availableDoubleDeckShips), f.pickFrameOffsetX+212+64+8, f.pickFrameOffsetY+14, f.transparentColor)
 	f.text.DrawMedium(screen, fmt.Sprintf("x%d", f.availableThreeDeckShips), f.pickFrameOffsetX+14+128+8, f.pickFrameOffsetY+62, f.transparentColor)
 	f.text.DrawMedium(screen, fmt.Sprintf("x%d", f.availableFourDeckShips), f.pickFrameOffsetX+14+128+8, f.pickFrameOffsetY+14, f.transparentColor)
+}
+
+func (f *Field) drawShootState(screen *ebiten.Image) {
+	mx, my := ebiten.CursorPosition()
+	if f.isFieldHover(mx, my) {
+		utils.DrawInCoordsWithColor(screen, f.assets.SelectImage, f.getX(f.j), f.getY(f.i), f.transparentColor)
+	}
 }

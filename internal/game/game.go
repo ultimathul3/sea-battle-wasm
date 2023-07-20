@@ -42,11 +42,15 @@ type Game struct {
 	joinGameResponse   chan network.JoinGameResponse
 	startGameResponse  chan network.StartGameResponse
 	waitResponse       chan network.WaitResponse
+	shootResponse      chan network.ShootResponse
 
 	nickname         string
 	opponentNickname string
 	hostUuid         string
 	opponentUuid     string
+
+	turn         Turn
+	lastX, lastY int
 }
 
 func New(cfg *config.Config) *Game {
@@ -98,4 +102,7 @@ func (g *Game) resetGame() {
 	g.joinGameResponse = make(chan network.JoinGameResponse)
 	g.startGameResponse = make(chan network.StartGameResponse)
 	g.waitResponse = make(chan network.WaitResponse)
+	g.shootResponse = make(chan network.ShootResponse)
+
+	g.turn = HostTurn
 }

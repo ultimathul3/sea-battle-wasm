@@ -6,4 +6,5 @@ const (
 	PlacementState FieldState = iota
 	PlacementFinishedState
 	CurtainState
+	ShootState
 )

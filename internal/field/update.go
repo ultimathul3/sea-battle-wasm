@@ -22,6 +22,20 @@ func (f *Field) Update() {
 	}
 }
 
+func (f *Field) IsEmptyCellTouched() (int, int, bool) {
+	tx, ty, isTouched := f.touch.IsTouched()
+
+	if isTouched && f.isFieldHover(tx, ty) && f.fieldMatrix[f.i][f.j] == EmptyCell {
+		return f.j - 1, f.i - 1, true
+	}
+
+	return -1, -1, false
+}
+
+func (f *Field) SetMissCell(x, y int) {
+	f.fieldMatrix[y+1][x+1] = MissCell
+}
+
 func (f *Field) updatePlacementState(tx, ty, mx, my int, isTouched bool) {
 	if isTouched {
 		if tx >= f.pickFrameOffsetX+212 && tx <= f.pickFrameOffsetX+212+32 && ty >= f.pickFrameOffsetY+62 && ty <= f.pickFrameOffsetY+62+32 {

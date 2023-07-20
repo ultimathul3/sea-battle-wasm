@@ -222,10 +222,54 @@ func (n *Network) Wait(input WaitRequest, ch chan<- WaitResponse) {
 	}
 
 	ch <- WaitResponse{
-		Status:  WaitStatus(wait.Status),
+		Status:  GameStatus(wait.Status),
 		X:       wait.X,
 		Y:       wait.Y,
 		Message: wait.Message,
 		Error:   nil,
+	}
+}
+
+func (n *Network) Shoot(input ShootRequest, ch chan<- ShootResponse) {
+	body, err := json.Marshal(input)
+	if err != nil {
+		ch <- ShootResponse{
+			Error: err,
+		}
+		return
+	}
+
+	response, err := http.Post(
+		fmt.Sprintf("%s:%d/games/shoot", n.serverHost, n.serverPort),
+		"application/json",
+		bytes.NewReader(body),
+	)
+	if err != nil {
+		ch <- ShootResponse{
+			Error: err,
+		}
+		return
+	}
+	defer response.Body.Close()
+
+	body, err = io.ReadAll(response.Body)
+	if err != nil {
+		ch <- ShootResponse{
+			Error: err,
+		}
+		return
+	}
+
+	shoot := Shoot{}
+	if err := json.Unmarshal(body, &shoot); err != nil {
+		ch <- ShootResponse{
+			Error: err,
+		}
+		return
+	}
+
+	ch <- ShootResponse{
+		Status: GameStatus(shoot.Status),
+		Error:  nil,
 	}
 }

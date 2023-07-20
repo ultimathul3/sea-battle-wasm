@@ -70,7 +70,7 @@ func (g *Game) drawJoinGameState(screen *ebiten.Image) {
 		}
 	}
 
-	g.updateButton.Draw(screen, 340, 100)
+	g.updateButton.Draw(screen, 320, 100)
 }
 
 func (g *Game) drawGameCreatedState(screen *ebiten.Image) {
@@ -99,10 +99,14 @@ func (g *Game) drawOpponentGameStartedState(screen *ebiten.Image) {
 	g.field.Draw(screen)
 	g.opponentField.Draw(screen)
 
-	g.text.DrawMedium(screen,
-		fmt.Sprintf("Ход игрока %s", g.nickname),
-		160, 9, color.White,
-	)
+	if g.turn == OpponentTurn {
+		g.text.DrawMedium(screen, "Ваш ход", 333, 9, color.White)
+	} else {
+		g.text.DrawMedium(screen,
+			fmt.Sprintf("Ход игрока %s", g.nickname),
+			220, 9, color.White,
+		)
+	}
 }
 
 func (g *Game) drawHostWaitOpponentState(screen *ebiten.Image) {
@@ -123,7 +127,14 @@ func (g *Game) drawHostGameStartedState(screen *ebiten.Image) {
 	g.field.Draw(screen)
 	g.opponentField.Draw(screen)
 
-	g.text.DrawMedium(screen, "Ваш ход", 260, 9, color.White)
+	if g.turn == HostTurn {
+		g.text.DrawMedium(screen, "Ваш ход", 333, 9, color.White)
+	} else {
+		g.text.DrawMedium(screen,
+			fmt.Sprintf("Ход игрока %s", g.nickname),
+			220, 9, color.White,
+		)
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

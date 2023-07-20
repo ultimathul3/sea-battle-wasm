@@ -62,23 +62,42 @@ type WaitRequest struct {
 }
 
 type WaitResponse struct {
-	Status  WaitStatus
+	Status  GameStatus
 	X       uint32
 	Y       uint32
 	Message string
 	Error   error
 }
 
-type WaitStatus string
+type GameStatus string
 
 const (
-	GameCreatedStatus        WaitStatus = "GAME_CREATED"
-	WaitingForOpponentStatus WaitStatus = "WAITING_FOR_OPPONENT"
-	GameStartedStatus        WaitStatus = "GAME_STARTED"
-	HostHitStatus            WaitStatus = "HOST_HIT"
-	HostMissStatus           WaitStatus = "HOST_MISS"
-	OpponentHitStatus        WaitStatus = "OPPONENT_HIT"
-	OpponentMissStatus       WaitStatus = "OPPONENT_MISS"
-	HostWonStatus            WaitStatus = "HOST_WON"
-	OpponentWonStatus        WaitStatus = "OPPONENT_WON"
+	GameCreatedStatus        GameStatus = "GAME_CREATED"
+	WaitingForOpponentStatus GameStatus = "WAITING_FOR_OPPONENT"
+	GameStartedStatus        GameStatus = "GAME_STARTED"
+	HostHitStatus            GameStatus = "HOST_HIT"
+	HostMissStatus           GameStatus = "HOST_MISS"
+	OpponentHitStatus        GameStatus = "OPPONENT_HIT"
+	OpponentMissStatus       GameStatus = "OPPONENT_MISS"
+	HostWonStatus            GameStatus = "HOST_WON"
+	OpponentWonStatus        GameStatus = "OPPONENT_WON"
 )
+
+type Shoot struct {
+	Status  string `json:"status"`
+	X       uint32 `json:"x"`
+	Y       uint32 `json:"y"`
+	Message string `json:"message"`
+}
+
+type ShootRequest struct {
+	HostNickname string `json:"host_nickname"`
+	X            uint32 `json:"x"`
+	Y            uint32 `json:"y"`
+	Uuid         string `json:"uuid"`
+}
+
+type ShootResponse struct {
+	Status GameStatus
+	Error  error
+}
