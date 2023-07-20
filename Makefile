@@ -1,5 +1,5 @@
 run:
-	go run cmd/app/main.go
+	DEVELOPMENT=1 go run cmd/app/main.go
 
 lint:
 	golangci-lint run

@@ -9,6 +9,12 @@ import (
 )
 
 func (g *Game) Update() error {
+	select {
+	case <-g.loadChannel:
+	default:
+		return nil
+	}
+
 	g.background.Update()
 
 	switch g.state {

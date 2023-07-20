@@ -5,10 +5,18 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/ultimathul3/sea-battle-wasm/internal/button"
 )
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	select {
+	case <-g.loadChannel:
+	default:
+		ebitenutil.DebugPrint(screen, LoadText)
+		return
+	}
+
 	g.background.Draw(screen)
 
 	switch g.state {

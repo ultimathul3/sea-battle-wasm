@@ -43,6 +43,7 @@ type Game struct {
 	startGameResponse  chan network.StartGameResponse
 	waitResponse       chan network.WaitResponse
 	shootResponse      chan network.ShootResponse
+	loadChannel        chan struct{}
 
 	nickname         string
 	opponentNickname string
@@ -55,14 +56,21 @@ type Game struct {
 
 func New(cfg *config.Config) *Game {
 	g := &Game{
-		assets:              assets.New(),
 		touch:               utils.NewTouch(),
 		state:               MenuState,
 		cfg:                 cfg,
 		gameButtonsPageSize: 4,
+		loadChannel:         make(chan struct{}),
 	}
 
-	g.background = background.New(g.assets.BackgroundImages, backgroundAnimationSpeed)
+	go g.load()
+
+	return g
+}
+
+func (g *Game) load() {
+	g.assets = assets.New()
+	g.background = background.New(g.assets.BackgroundImages)
 	g.text = text.New(g.assets.LargeFont, g.assets.MediumFont, yLargeFontOffset, yMediumFontOffset, yMediumFontCharWidth, yMediumFontSizeBetweenChars)
 	g.network = network.New(g.cfg.HttpServer.Host, g.cfg.HttpServer.Port)
 
@@ -80,7 +88,7 @@ func New(cfg *config.Config) *Game {
 	g.updateButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, updateButtonText, LightGrayColor, DarkGreenColor)
 	g.startButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, startButtonText, LightGrayColor, DarkGreenColor)
 
-	return g
+	close(g.loadChannel)
 }
 
 func (g *Game) resetGame() {

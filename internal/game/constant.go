@@ -20,6 +20,7 @@ const (
 	YourTurnText         = "Ваш ход"
 	PlayerTurnTextFmt    = "Ход игрока %s"
 	PlayerWaitingTextFmt = "Ожидание игрока %s..."
+	LoadText             = "LOADING..."
 )
 
 type Turn int
@@ -35,10 +36,6 @@ var (
 	GreenColor       = color.RGBA{0, 200, 0, 255}
 	DarkGreenColor   = color.RGBA{0, 100, 0, 255}
 	TransparentColor = color.RGBA{255, 255, 255, 170}
-)
-
-const (
-	backgroundAnimationSpeed = 4
 )
 
 const (

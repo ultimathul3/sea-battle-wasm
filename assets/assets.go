@@ -5,9 +5,9 @@ import (
 )
 
 var (
-	//go:embed images/backgrounds
+	//go:embed images/background
 	BackgroundImagesDir     embed.FS
-	BackgroundImagesDirPath = "images/backgrounds"
+	BackgroundImagesDirPath = "images/background"
 )
 
 var (

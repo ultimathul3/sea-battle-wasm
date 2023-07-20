@@ -6,6 +6,7 @@ import (
 	"image"
 	_ "image/png"
 	"log"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -122,6 +123,10 @@ func loadBackgroundImages() []*ebiten.Image {
 	}
 
 	for i := range dir {
+		if i == 1 && os.Getenv("DEVELOPMENT") == "1" {
+			break
+		}
+
 		data, err := BackgroundImagesDir.ReadFile(
 			fmt.Sprintf("%s/%d.png", BackgroundImagesDirPath, i),
 		)
