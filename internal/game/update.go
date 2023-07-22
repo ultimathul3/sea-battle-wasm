@@ -48,7 +48,6 @@ func (g *Game) updateMenuState() {
 	g.joinGameButton.Update(func() {
 		g.state = JoinGameState
 		g.resetGame()
-		g.gameButtons = nil
 		go g.network.GetGames(g.getGamesResponse)
 	})
 }
@@ -75,8 +74,6 @@ func (g *Game) updateCreateGameState() {
 
 func (g *Game) updateJoinGameState() {
 	g.backButton.Update(func() {
-		g.gameButtonsOffset = 0
-		g.gameButtons = nil
 		g.state = MenuState
 	})
 

@@ -2,6 +2,7 @@ package game
 
 import (
 	"os"
+	"runtime"
 
 	"github.com/ultimathul3/sea-battle-wasm/assets"
 	"github.com/ultimathul3/sea-battle-wasm/internal/background"
@@ -69,6 +70,8 @@ func New(cfg *config.Config) *Game {
 }
 
 func (g *Game) load() {
+	runtime.Gosched()
+
 	g.assets = assets.New()
 	g.background = background.New(g.assets.BackgroundImages)
 	g.text = text.New(g.assets.LargeFont, g.assets.MediumFont, yLargeFontOffset, yMediumFontOffset, yMediumFontCharWidth, yMediumFontSizeBetweenChars)
@@ -111,6 +114,9 @@ func (g *Game) resetGame() {
 	g.startGameResponse = make(chan network.StartGameResponse)
 	g.waitResponse = make(chan network.WaitResponse)
 	g.shootResponse = make(chan network.ShootResponse)
+
+	g.gameButtons = nil
+	g.gameButtonsOffset = 0
 
 	g.turn = HostTurn
 }
