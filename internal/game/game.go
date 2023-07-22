@@ -46,13 +46,14 @@ type Game struct {
 	shootResponse      chan network.ShootResponse
 	loadChannel        chan struct{}
 
-	nickname         string
+	hostNickname     string
 	opponentNickname string
 	hostUuid         string
 	opponentUuid     string
 
 	turn         Turn
 	lastX, lastY int
+	isShot       bool
 }
 
 func New(cfg *config.Config) *Game {
@@ -76,12 +77,6 @@ func (g *Game) load() {
 	g.background = background.New(g.assets.BackgroundImages)
 	g.text = text.New(g.assets.LargeFont, g.assets.MediumFont, yLargeFontOffset, yMediumFontOffset, yMediumFontCharWidth, yMediumFontSizeBetweenChars)
 	g.network = network.New(g.cfg.HttpServer.Host, g.cfg.HttpServer.Port)
-
-	if len(os.Args) < 2 {
-		g.nickname = g.cfg.DevelopmentNickname
-	} else {
-		g.nickname = os.Args[1]
-	}
 
 	g.createGameButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, createGameText, GrayColor, GreenColor)
 	g.joinGameButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, joinGameText, GrayColor, GreenColor)
@@ -108,6 +103,14 @@ func (g *Game) resetGame() {
 		field.CurtainState,
 	)
 
+	if os.Args[0] != "js" {
+		g.hostNickname = g.cfg.DevelopmentNickname
+		g.opponentNickname = g.cfg.DevelopmentNickname
+	} else {
+		g.hostNickname = os.Args[1]
+		g.opponentNickname = os.Args[1]
+	}
+
 	g.getGamesResponse = make(chan network.GetGamesResponse)
 	g.createGameResponse = make(chan network.CreateGameResponse)
 	g.joinGameResponse = make(chan network.JoinGameResponse)
@@ -119,4 +122,5 @@ func (g *Game) resetGame() {
 	g.gameButtonsOffset = 0
 
 	g.turn = HostTurn
+	g.isShot = false
 }

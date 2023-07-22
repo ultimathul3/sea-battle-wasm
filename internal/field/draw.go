@@ -31,6 +31,10 @@ func (f *Field) Draw(screen *ebiten.Image) {
 			case MissCell:
 				utils.DrawInCoordsWithColor(screen, f.assets.MissImage, f.getX(j)+1, f.getY(i)+1, f.transparentColor)
 			}
+
+			if f.hitMask[i-1][j-1] {
+				utils.DrawInCoordsWithColor(screen, f.assets.HitImage, f.getX(j)+1, f.getY(i)+1, f.transparentColor)
+			}
 		}
 	}
 

@@ -65,7 +65,7 @@ func (g *Game) updateCreateGameState() {
 			g.field.SetState(field.PlacementFinishedState)
 			stringField := g.field.ConvertFieldRuneMatrixToString()
 			go g.network.CreateGame(network.CreateGameRequest{
-				HostNickname: g.nickname,
+				HostNickname: g.hostNickname,
 				HostField:    stringField,
 			}, g.createGameResponse)
 		})
@@ -88,10 +88,10 @@ func (g *Game) updateJoinGameState() {
 	for _, btn := range g.gameButtons {
 		btn.Update(func() {
 			g.state = JoinPlacementState
-			g.opponentNickname = btn.Label
+			g.hostNickname = btn.Label
 			go g.network.JoinGame(network.JoinGameRequest{
-				HostNickname:     g.nickname,
-				OpponentNickname: btn.Label,
+				HostNickname:     g.hostNickname,
+				OpponentNickname: g.opponentNickname,
 			}, g.joinGameResponse)
 		})
 	}
@@ -156,7 +156,7 @@ func (g *Game) updateJoinPlacementState() {
 			g.field.SetState(field.PlacementFinishedState)
 			stringField := g.field.ConvertFieldRuneMatrixToString()
 			go g.network.StartGame(network.StartGameRequest{
-				HostNickname:  g.nickname,
+				HostNickname:  g.hostNickname,
 				OpponentField: stringField,
 				OpponentUuid:  g.opponentUuid,
 			}, g.startGameResponse)
@@ -181,33 +181,40 @@ func (g *Game) updateOpponentGameStartedState() {
 	g.opponentField.Update()
 
 	x, y, isTouched := g.opponentField.IsEmptyCellTouched()
-	if isTouched && g.turn == OpponentTurn {
+	if isTouched && g.turn == OpponentTurn && !g.isShot {
 		g.lastX = x
 		g.lastY = y
+		g.isShot = true
 		go g.network.Shoot(network.ShootRequest{
-			HostNickname: g.nickname,
+			HostNickname: g.hostNickname,
 			X:            uint32(x),
 			Y:            uint32(y),
 			Uuid:         g.opponentUuid,
 		}, g.shootResponse)
-		go g.network.Wait(network.WaitRequest{Uuid: g.opponentUuid}, g.waitResponse)
 	}
 
 	if r, err := g.updateShootResponse(); err != nil {
 		g.handleErrorResponse(err)
 	} else if r != nil {
-		g.turn = HostTurn
 		if r.Status == network.OpponentMissStatus {
+			go g.network.Wait(network.WaitRequest{Uuid: g.opponentUuid}, g.waitResponse)
 			g.opponentField.SetMissCell(g.lastX, g.lastY)
+			g.turn = HostTurn
+		} else if r.Status == network.OpponentHitStatus {
+			g.opponentField.SetHitCell(g.lastX, g.lastY)
 		}
+		g.isShot = false
 	}
 
 	if r, err := g.updateWaitResponse(); err != nil {
 		g.handleErrorResponse(err)
 	} else if r != nil {
-		g.turn = OpponentTurn
 		if r.Status == network.HostMissStatus {
 			g.field.SetMissCell(int(r.X), int(r.Y))
+			g.turn = OpponentTurn
+		} else if r.Status == network.HostHitStatus {
+			go g.network.Wait(network.WaitRequest{Uuid: g.opponentUuid}, g.waitResponse)
+			g.field.SetHitCell(int(r.X), int(r.Y))
 		}
 	}
 }
@@ -239,33 +246,40 @@ func (g *Game) updateHostGameStartedState() {
 	g.opponentField.Update()
 
 	x, y, isTouched := g.opponentField.IsEmptyCellTouched()
-	if isTouched && g.turn == HostTurn {
+	if isTouched && g.turn == HostTurn && !g.isShot {
 		g.lastX = x
 		g.lastY = y
+		g.isShot = true
 		go g.network.Shoot(network.ShootRequest{
-			HostNickname: g.nickname,
+			HostNickname: g.hostNickname,
 			X:            uint32(x),
 			Y:            uint32(y),
 			Uuid:         g.hostUuid,
 		}, g.shootResponse)
-		go g.network.Wait(network.WaitRequest{Uuid: g.hostUuid}, g.waitResponse)
 	}
 
 	if r, err := g.updateShootResponse(); err != nil {
 		g.handleErrorResponse(err)
 	} else if r != nil {
-		g.turn = OpponentTurn
 		if r.Status == network.HostMissStatus {
+			go g.network.Wait(network.WaitRequest{Uuid: g.hostUuid}, g.waitResponse)
 			g.opponentField.SetMissCell(g.lastX, g.lastY)
+			g.turn = OpponentTurn
+		} else if r.Status == network.HostHitStatus {
+			g.opponentField.SetHitCell(g.lastX, g.lastY)
 		}
+		g.isShot = false
 	}
 
 	if r, err := g.updateWaitResponse(); err != nil {
 		g.handleErrorResponse(err)
 	} else if r != nil {
-		g.turn = HostTurn
 		if r.Status == network.OpponentMissStatus {
 			g.field.SetMissCell(int(r.X), int(r.Y))
+			g.turn = HostTurn
+		} else if r.Status == network.OpponentHitStatus {
+			go g.network.Wait(network.WaitRequest{Uuid: g.hostUuid}, g.waitResponse)
+			g.field.SetHitCell(int(r.X), int(r.Y))
 		}
 	}
 }

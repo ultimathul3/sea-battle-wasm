@@ -36,6 +36,10 @@ func (f *Field) SetMissCell(x, y int) {
 	f.fieldMatrix[y+1][x+1] = MissCell
 }
 
+func (f *Field) SetHitCell(x, y int) {
+	f.hitMask[y][x] = true
+}
+
 func (f *Field) updatePlacementState(tx, ty, mx, my int, isTouched bool) {
 	if isTouched {
 		if tx >= f.pickFrameOffsetX+212 && tx <= f.pickFrameOffsetX+212+32 && ty >= f.pickFrameOffsetY+62 && ty <= f.pickFrameOffsetY+62+32 {

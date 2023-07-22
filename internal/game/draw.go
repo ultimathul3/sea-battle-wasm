@@ -110,7 +110,7 @@ func (g *Game) drawOpponentGameStartedState(screen *ebiten.Image) {
 	if g.turn == OpponentTurn {
 		g.text.DrawMediumInCenter(screen, YourTurnText, 9, color.White)
 	} else {
-		g.text.DrawMediumInCenter(screen, fmt.Sprintf(PlayerTurnTextFmt, g.nickname), 9, color.White)
+		g.text.DrawMediumInCenter(screen, fmt.Sprintf(PlayerTurnTextFmt, g.hostNickname), 9, color.White)
 	}
 }
 
@@ -135,7 +135,7 @@ func (g *Game) drawHostGameStartedState(screen *ebiten.Image) {
 	if g.turn == HostTurn {
 		g.text.DrawMediumInCenter(screen, YourTurnText, 9, color.White)
 	} else {
-		g.text.DrawMediumInCenter(screen, fmt.Sprintf(PlayerTurnTextFmt, g.nickname), 9, color.White)
+		g.text.DrawMediumInCenter(screen, fmt.Sprintf(PlayerTurnTextFmt, g.hostNickname), 9, color.White)
 	}
 }
 

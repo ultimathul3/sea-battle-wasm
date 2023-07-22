@@ -36,6 +36,7 @@ type Field struct {
 	availableFourDeckShips   int
 
 	fieldMatrix [][]rune
+	hitMask     [][]bool
 	i, j        int
 
 	state FieldState
@@ -99,6 +100,11 @@ func (f *Field) ConvertFieldRuneMatrixToString() string {
 
 func (f *Field) initFieldMatrix() {
 	f.fieldMatrix = make([][]rune, 0, FieldDimension+2)
+
+	f.hitMask = make([][]bool, FieldDimension)
+	for i := 0; i < FieldDimension; i++ {
+		f.hitMask[i] = make([]bool, FieldDimension)
+	}
 
 	frame := make([]rune, 0, FieldDimension+2)
 	frame2 := make([]rune, 0, FieldDimension+2)

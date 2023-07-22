@@ -63,4 +63,6 @@ var (
 var (
 	//go:embed images/field/miss.png
 	MissImage []byte
+	//go:embed images/field/hit.png
+	HitImage []byte
 )
