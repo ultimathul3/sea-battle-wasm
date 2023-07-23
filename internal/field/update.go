@@ -40,6 +40,28 @@ func (f *Field) SetHitCell(x, y int) {
 	f.hitMask[y][x] = true
 }
 
+func (f *Field) DestroyShip(ship Ship, x, y int) {
+	switch ship {
+	case SingleDeckShip:
+		f.fieldMatrix[y+1][x+1] = SingleDeckShipCell
+		f.fillLeftCells(y+1, x+1, MissCell)
+		f.fillRightCells(y+1, x+1, MissCell)
+		f.fillTopAndBottomCells(y+1, x+1, MissCell)
+	case DoubleDeckShipDown:
+		f.placeShipDown(y+1, x+1, MissCell, 2)
+	case ThreeDeckShipDown:
+		f.placeShipDown(y+1, x+1, MissCell, 3)
+	case FourDeckShipDown:
+		f.placeShipDown(y+1, x+1, MissCell, 4)
+	case DoubleDeckShipRight:
+		f.placeShipRight(y+1, x+1, MissCell, 2)
+	case ThreeDeckShipRight:
+		f.placeShipRight(y+1, x+1, MissCell, 3)
+	case FourDeckShipRight:
+		f.placeShipRight(y+1, x+1, MissCell, 4)
+	}
+}
+
 func (f *Field) updatePlacementState(tx, ty, mx, my int, isTouched bool) {
 	if isTouched {
 		if tx >= f.pickFrameOffsetX+212 && tx <= f.pickFrameOffsetX+212+32 && ty >= f.pickFrameOffsetY+62 && ty <= f.pickFrameOffsetY+62+32 {
@@ -195,34 +217,34 @@ func (f *Field) placeShip() {
 			return
 		}
 		if f.placeDirection == RightDirection {
-			f.placeShipRight(2)
+			f.placeShipRight(f.i, f.j, OccupiedCell, 2)
 		} else {
-			f.placeShipDown(2)
+			f.placeShipDown(f.i, f.j, OccupiedCell, 2)
 		}
 	case ThreeDeckShipSelected:
 		if f.availableThreeDeckShips == 0 {
 			return
 		}
 		if f.placeDirection == RightDirection {
-			f.placeShipRight(3)
+			f.placeShipRight(f.i, f.j, OccupiedCell, 3)
 		} else {
-			f.placeShipDown(3)
+			f.placeShipDown(f.i, f.j, OccupiedCell, 3)
 		}
 	case FourDeckShipSelected:
 		if f.availableFourDeckShips == 0 {
 			return
 		}
 		if f.placeDirection == RightDirection {
-			f.placeShipRight(4)
+			f.placeShipRight(f.i, f.j, OccupiedCell, 4)
 		} else {
-			f.placeShipDown(4)
+			f.placeShipDown(f.i, f.j, OccupiedCell, 4)
 		}
 	}
 }
 
-func (f *Field) placeShipRight(shipDeck int) {
-	for i := 1; i < shipDeck; i++ {
-		if f.fieldMatrix[f.i][f.j+i] != EmptyCell {
+func (f *Field) placeShipRight(i, j int, cellAround rune, shipDeck int) {
+	for l := 1; l < shipDeck; l++ {
+		if f.fieldMatrix[i][j+l] != EmptyCell {
 			return
 		}
 	}
@@ -242,24 +264,24 @@ func (f *Field) placeShipRight(shipDeck int) {
 		return
 	}
 
-	f.fieldMatrix[f.i][f.j] = ship
-	f.fillLeftCells(f.i, f.j, OccupiedCell)
+	f.fieldMatrix[i][j] = ship
+	f.fillLeftCells(i, j, cellAround)
 
-	for i := 0; i < shipDeck; i++ {
-		f.fillTopAndBottomCells(f.i, f.j+i, OccupiedCell)
-		if i == shipDeck-1 {
-			f.fieldMatrix[f.i][f.j+i] = ShipLeftEndCell
-		} else if i > 0 {
-			f.fieldMatrix[f.i][f.j+i] = ShipLeftCell
+	for l := 0; l < shipDeck; l++ {
+		f.fillTopAndBottomCells(i, j+l, cellAround)
+		if l == shipDeck-1 {
+			f.fieldMatrix[i][j+l] = ShipLeftEndCell
+		} else if l > 0 {
+			f.fieldMatrix[i][j+l] = ShipLeftCell
 		}
 	}
 
-	f.fillRightCells(f.i, f.j+shipDeck-1, OccupiedCell)
+	f.fillRightCells(i, j+shipDeck-1, cellAround)
 }
 
-func (f *Field) placeShipDown(shipDeck int) {
-	for i := 1; i < shipDeck; i++ {
-		if f.fieldMatrix[f.i+i][f.j] != EmptyCell {
+func (f *Field) placeShipDown(i, j int, cellAround rune, shipDeck int) {
+	for l := 1; l < shipDeck; l++ {
+		if f.fieldMatrix[i+l][j] != EmptyCell {
 			return
 		}
 	}
@@ -279,17 +301,17 @@ func (f *Field) placeShipDown(shipDeck int) {
 		return
 	}
 
-	f.fieldMatrix[f.i][f.j] = ship
-	f.fillTopCells(f.i, f.j, OccupiedCell)
+	f.fieldMatrix[i][j] = ship
+	f.fillTopCells(i, j, cellAround)
 
-	for i := 0; i < shipDeck; i++ {
-		f.fillLeftAndRightCells(f.i+i, f.j, OccupiedCell)
-		if i == shipDeck-1 {
-			f.fieldMatrix[f.i+i][f.j] = ShipUpEndCell
-		} else if i > 0 {
-			f.fieldMatrix[f.i+i][f.j] = ShipUpCell
+	for l := 0; l < shipDeck; l++ {
+		f.fillLeftAndRightCells(i+l, j, cellAround)
+		if l == shipDeck-1 {
+			f.fieldMatrix[i+l][j] = ShipUpEndCell
+		} else if l > 0 {
+			f.fieldMatrix[i+l][j] = ShipUpCell
 		}
 	}
 
-	f.fillBottomCells(f.i+shipDeck-1, f.j, OccupiedCell)
+	f.fillBottomCells(i+shipDeck-1, j, cellAround)
 }

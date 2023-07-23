@@ -201,6 +201,24 @@ func (g *Game) updateOpponentGameStartedState() {
 			g.opponentField.SetMissCell(g.lastX, g.lastY)
 			g.turn = HostTurn
 		} else if r.Status == network.OpponentHitStatus {
+			if r.DestroyedShip != "" {
+				switch r.DestroyedShip {
+				case network.SingleDeckShip:
+					g.opponentField.DestroyShip(field.SingleDeckShip, int(r.X), int(r.Y))
+				case network.DoubleDeckShipDown:
+					g.opponentField.DestroyShip(field.DoubleDeckShipDown, int(r.X), int(r.Y))
+				case network.ThreeDeckShipDown:
+					g.opponentField.DestroyShip(field.ThreeDeckShipDown, int(r.X), int(r.Y))
+				case network.FourDeckShipDown:
+					g.opponentField.DestroyShip(field.FourDeckShipDown, int(r.X), int(r.Y))
+				case network.DoubleDeckShipRight:
+					g.opponentField.DestroyShip(field.DoubleDeckShipRight, int(r.X), int(r.Y))
+				case network.ThreeDeckShipRight:
+					g.opponentField.DestroyShip(field.ThreeDeckShipRight, int(r.X), int(r.Y))
+				case network.FourDeckShipRight:
+					g.opponentField.DestroyShip(field.FourDeckShipRight, int(r.X), int(r.Y))
+				}
+			}
 			g.opponentField.SetHitCell(g.lastX, g.lastY)
 		}
 		g.isShot = false
@@ -266,6 +284,24 @@ func (g *Game) updateHostGameStartedState() {
 			g.opponentField.SetMissCell(g.lastX, g.lastY)
 			g.turn = OpponentTurn
 		} else if r.Status == network.HostHitStatus {
+			if r.DestroyedShip != "" {
+				switch r.DestroyedShip {
+				case network.SingleDeckShip:
+					g.opponentField.DestroyShip(field.SingleDeckShip, int(r.X), int(r.Y))
+				case network.DoubleDeckShipDown:
+					g.opponentField.DestroyShip(field.DoubleDeckShipDown, int(r.X), int(r.Y))
+				case network.ThreeDeckShipDown:
+					g.opponentField.DestroyShip(field.ThreeDeckShipDown, int(r.X), int(r.Y))
+				case network.FourDeckShipDown:
+					g.opponentField.DestroyShip(field.FourDeckShipDown, int(r.X), int(r.Y))
+				case network.DoubleDeckShipRight:
+					g.opponentField.DestroyShip(field.DoubleDeckShipRight, int(r.X), int(r.Y))
+				case network.ThreeDeckShipRight:
+					g.opponentField.DestroyShip(field.ThreeDeckShipRight, int(r.X), int(r.Y))
+				case network.FourDeckShipRight:
+					g.opponentField.DestroyShip(field.FourDeckShipRight, int(r.X), int(r.Y))
+				}
+			}
 			g.opponentField.SetHitCell(g.lastX, g.lastY)
 		}
 		g.isShot = false

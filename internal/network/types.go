@@ -72,6 +72,7 @@ type WaitResponse struct {
 type GameStatus string
 
 const (
+	UnknownStatus            GameStatus = "UNKNOWN"
 	GameCreatedStatus        GameStatus = "GAME_CREATED"
 	WaitingForOpponentStatus GameStatus = "WAITING_FOR_OPPONENT"
 	GameStartedStatus        GameStatus = "GAME_STARTED"
@@ -83,11 +84,24 @@ const (
 	OpponentWonStatus        GameStatus = "OPPONENT_WON"
 )
 
+type Ship string
+
+const (
+	UnknownShip         Ship = "UNKNOWN"
+	SingleDeckShip      Ship = "SINGLE_DECK"
+	DoubleDeckShipDown  Ship = "DOUBLE_DECK_DOWN"
+	ThreeDeckShipDown   Ship = "THREE_DECK_DOWN"
+	FourDeckShipDown    Ship = "FOUR_DECK_DOWN"
+	DoubleDeckShipRight Ship = "DOUBLE_DECK_RIGHT"
+	ThreeDeckShipRight  Ship = "THREE_DECK_RIGHT"
+	FourDeckShipRight   Ship = "FOUR_DECK_RIGHT"
+)
+
 type Shoot struct {
-	Status  string `json:"status"`
-	X       uint32 `json:"x"`
-	Y       uint32 `json:"y"`
-	Message string `json:"message"`
+	Status        string `json:"status"`
+	DestroyedShip string `json:"destroyed_ship"`
+	X             uint32 `json:"x"`
+	Y             uint32 `json:"y"`
 }
 
 type ShootRequest struct {
@@ -98,6 +112,9 @@ type ShootRequest struct {
 }
 
 type ShootResponse struct {
-	Status GameStatus
-	Error  error
+	Status        GameStatus
+	DestroyedShip Ship
+	X             uint32
+	Y             uint32
+	Error         error
 }

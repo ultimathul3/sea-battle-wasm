@@ -269,7 +269,10 @@ func (n *Network) Shoot(input ShootRequest, ch chan<- ShootResponse) {
 	}
 
 	ch <- ShootResponse{
-		Status: GameStatus(shoot.Status),
-		Error:  nil,
+		Status:        GameStatus(shoot.Status),
+		DestroyedShip: Ship(shoot.DestroyedShip),
+		X:             shoot.X,
+		Y:             shoot.Y,
+		Error:         nil,
 	}
 }

@@ -39,3 +39,16 @@ const (
 	MissCell                = rune('.')
 	FrameCell               = rune('~')
 )
+
+type Ship uint8
+
+const (
+	UnknownShip Ship = iota
+	SingleDeckShip
+	DoubleDeckShipDown
+	ThreeDeckShipDown
+	FourDeckShipDown
+	DoubleDeckShipRight
+	ThreeDeckShipRight
+	FourDeckShipRight
+)
