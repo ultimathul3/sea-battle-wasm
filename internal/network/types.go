@@ -51,10 +51,13 @@ type StartGameResponse struct {
 }
 
 type Wait struct {
-	Status  string `json:"status"`
-	X       uint32 `json:"x"`
-	Y       uint32 `json:"y"`
-	Message string `json:"message"`
+	Status        string `json:"status"`
+	X             uint32 `json:"x"`
+	Y             uint32 `json:"y"`
+	DestroyedShip string `json:"destroyed_ship"`
+	DestroyedX    uint32 `json:"destroyed_x"`
+	DestroyedY    uint32 `json:"destroyed_y"`
+	Message       string `json:"message"`
 }
 
 type WaitRequest struct {
@@ -62,11 +65,14 @@ type WaitRequest struct {
 }
 
 type WaitResponse struct {
-	Status  GameStatus
-	X       uint32
-	Y       uint32
-	Message string
-	Error   error
+	Status        GameStatus
+	X             uint32
+	Y             uint32
+	DestroyedShip Ship
+	DestroyedX    uint32
+	DestroyedY    uint32
+	Message       string
+	Error         error
 }
 
 type GameStatus string

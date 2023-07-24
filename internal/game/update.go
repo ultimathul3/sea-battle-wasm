@@ -43,11 +43,39 @@ func (g *Game) updateMenuState() {
 	g.createGameButton.Update(func() {
 		g.state = CreateGameState
 		g.resetGame()
+		g.field.SetFieldMatrix([][]rune{
+			[]rune("~~~~~~~~~~~~"),
+			[]rune("~          ~"),
+			[]rune("~          ~"),
+			[]rune("xxx     xxxx"),
+			[]rune("x1x     x@◄x"),
+			[]rune("xxxxxxxxxxxx"),
+			[]rune("x1xx$←←◄x  ~"),
+			[]rune("xxxxxxxxxxx~"),
+			[]rune("x1x#←◄xx@◄x~"),
+			[]rune("xxxxxxxxxxx~"),
+			[]rune("x1x#←◄xx@◄x~"),
+			[]rune("xxxxxxxxxxx~"),
+		})
 	})
 
 	g.joinGameButton.Update(func() {
 		g.state = JoinGameState
 		g.resetGame()
+		g.field.SetFieldMatrix([][]rune{
+			[]rune("~~~~~~~~~~~~"),
+			[]rune("~          ~"),
+			[]rune("~   xxx    ~"),
+			[]rune("~xxxx2x    ~"),
+			[]rune("~x1xx▲x    ~"),
+			[]rune("xxxxxxx xxx~"),
+			[]rune("x1x   xxx2x~"),
+			[]rune("xxxxxxx4x▲x~"),
+			[]rune("x1x3x3x↑xxx~"),
+			[]rune("xxx↑x↑x↑x2x~"),
+			[]rune("x1x▲x▲x▲x▲x~"),
+			[]rune("xxxxxxxxxxx~"),
+		})
 		go g.network.GetGames(g.getGamesResponse)
 	})
 }
@@ -172,71 +200,6 @@ func (g *Game) updateJoinPlacementState() {
 	}
 }
 
-func (g *Game) updateOpponentGameStartedState() {
-	g.backButton.Update(func() {
-		g.state = MenuState
-	})
-
-	g.field.Update()
-	g.opponentField.Update()
-
-	x, y, isTouched := g.opponentField.IsEmptyCellTouched()
-	if isTouched && g.turn == OpponentTurn && !g.isShot {
-		g.lastX = x
-		g.lastY = y
-		g.isShot = true
-		go g.network.Shoot(network.ShootRequest{
-			HostNickname: g.hostNickname,
-			X:            uint32(x),
-			Y:            uint32(y),
-			Uuid:         g.opponentUuid,
-		}, g.shootResponse)
-	}
-
-	if r, err := g.updateShootResponse(); err != nil {
-		g.handleErrorResponse(err)
-	} else if r != nil {
-		if r.Status == network.OpponentMissStatus {
-			go g.network.Wait(network.WaitRequest{Uuid: g.opponentUuid}, g.waitResponse)
-			g.opponentField.SetMissCell(g.lastX, g.lastY)
-			g.turn = HostTurn
-		} else if r.Status == network.OpponentHitStatus {
-			if r.DestroyedShip != "" {
-				switch r.DestroyedShip {
-				case network.SingleDeckShip:
-					g.opponentField.DestroyShip(field.SingleDeckShip, int(r.X), int(r.Y))
-				case network.DoubleDeckShipDown:
-					g.opponentField.DestroyShip(field.DoubleDeckShipDown, int(r.X), int(r.Y))
-				case network.ThreeDeckShipDown:
-					g.opponentField.DestroyShip(field.ThreeDeckShipDown, int(r.X), int(r.Y))
-				case network.FourDeckShipDown:
-					g.opponentField.DestroyShip(field.FourDeckShipDown, int(r.X), int(r.Y))
-				case network.DoubleDeckShipRight:
-					g.opponentField.DestroyShip(field.DoubleDeckShipRight, int(r.X), int(r.Y))
-				case network.ThreeDeckShipRight:
-					g.opponentField.DestroyShip(field.ThreeDeckShipRight, int(r.X), int(r.Y))
-				case network.FourDeckShipRight:
-					g.opponentField.DestroyShip(field.FourDeckShipRight, int(r.X), int(r.Y))
-				}
-			}
-			g.opponentField.SetHitCell(g.lastX, g.lastY)
-		}
-		g.isShot = false
-	}
-
-	if r, err := g.updateWaitResponse(); err != nil {
-		g.handleErrorResponse(err)
-	} else if r != nil {
-		if r.Status == network.HostMissStatus {
-			g.field.SetMissCell(int(r.X), int(r.Y))
-			g.turn = OpponentTurn
-		} else if r.Status == network.HostHitStatus {
-			go g.network.Wait(network.WaitRequest{Uuid: g.opponentUuid}, g.waitResponse)
-			g.field.SetHitCell(int(r.X), int(r.Y))
-		}
-	}
-}
-
 func (g *Game) updateHostWaitOpponentState() {
 	g.backButton.Update(func() {
 		g.state = MenuState
@@ -255,7 +218,15 @@ func (g *Game) updateHostWaitOpponentState() {
 	g.opponentField.Update()
 }
 
+func (g *Game) updateOpponentGameStartedState() {
+	g.updateGameStartedState(OpponentTurn)
+}
+
 func (g *Game) updateHostGameStartedState() {
+	g.updateGameStartedState(HostTurn)
+}
+
+func (g *Game) updateGameStartedState(turn Turn) {
 	g.backButton.Update(func() {
 		g.state = MenuState
 	})
@@ -263,8 +234,29 @@ func (g *Game) updateHostGameStartedState() {
 	g.field.Update()
 	g.opponentField.Update()
 
+	var uuid string
+	var missStatus, hitStatus network.GameStatus
+	var oppositeMissStatus, oppositeHitStatus network.GameStatus
+	var oppositeTurn Turn
+
+	if turn == HostTurn {
+		uuid = g.hostUuid
+		missStatus = network.HostMissStatus
+		hitStatus = network.HostHitStatus
+		oppositeTurn = OpponentTurn
+		oppositeMissStatus = network.OpponentMissStatus
+		oppositeHitStatus = network.OpponentHitStatus
+	} else {
+		uuid = g.opponentUuid
+		missStatus = network.OpponentMissStatus
+		hitStatus = network.OpponentHitStatus
+		oppositeTurn = HostTurn
+		oppositeMissStatus = network.HostMissStatus
+		oppositeHitStatus = network.HostHitStatus
+	}
+
 	x, y, isTouched := g.opponentField.IsEmptyCellTouched()
-	if isTouched && g.turn == HostTurn && !g.isShot {
+	if isTouched && g.turn == turn && !g.isShot {
 		g.lastX = x
 		g.lastY = y
 		g.isShot = true
@@ -272,35 +264,20 @@ func (g *Game) updateHostGameStartedState() {
 			HostNickname: g.hostNickname,
 			X:            uint32(x),
 			Y:            uint32(y),
-			Uuid:         g.hostUuid,
+			Uuid:         uuid,
 		}, g.shootResponse)
 	}
 
 	if r, err := g.updateShootResponse(); err != nil {
 		g.handleErrorResponse(err)
 	} else if r != nil {
-		if r.Status == network.HostMissStatus {
-			go g.network.Wait(network.WaitRequest{Uuid: g.hostUuid}, g.waitResponse)
+		if r.Status == missStatus {
+			go g.network.Wait(network.WaitRequest{Uuid: uuid}, g.waitResponse)
 			g.opponentField.SetMissCell(g.lastX, g.lastY)
-			g.turn = OpponentTurn
-		} else if r.Status == network.HostHitStatus {
+			g.turn = oppositeTurn
+		} else if r.Status == hitStatus {
 			if r.DestroyedShip != "" {
-				switch r.DestroyedShip {
-				case network.SingleDeckShip:
-					g.opponentField.DestroyShip(field.SingleDeckShip, int(r.X), int(r.Y))
-				case network.DoubleDeckShipDown:
-					g.opponentField.DestroyShip(field.DoubleDeckShipDown, int(r.X), int(r.Y))
-				case network.ThreeDeckShipDown:
-					g.opponentField.DestroyShip(field.ThreeDeckShipDown, int(r.X), int(r.Y))
-				case network.FourDeckShipDown:
-					g.opponentField.DestroyShip(field.FourDeckShipDown, int(r.X), int(r.Y))
-				case network.DoubleDeckShipRight:
-					g.opponentField.DestroyShip(field.DoubleDeckShipRight, int(r.X), int(r.Y))
-				case network.ThreeDeckShipRight:
-					g.opponentField.DestroyShip(field.ThreeDeckShipRight, int(r.X), int(r.Y))
-				case network.FourDeckShipRight:
-					g.opponentField.DestroyShip(field.FourDeckShipRight, int(r.X), int(r.Y))
-				}
+				g.destroyShip(g.opponentField, r.DestroyedShip, int(r.X), int(r.Y))
 			}
 			g.opponentField.SetHitCell(g.lastX, g.lastY)
 		}
@@ -310,13 +287,35 @@ func (g *Game) updateHostGameStartedState() {
 	if r, err := g.updateWaitResponse(); err != nil {
 		g.handleErrorResponse(err)
 	} else if r != nil {
-		if r.Status == network.OpponentMissStatus {
+		if r.Status == oppositeMissStatus {
 			g.field.SetMissCell(int(r.X), int(r.Y))
-			g.turn = HostTurn
-		} else if r.Status == network.OpponentHitStatus {
-			go g.network.Wait(network.WaitRequest{Uuid: g.hostUuid}, g.waitResponse)
+			g.turn = turn
+		} else if r.Status == oppositeHitStatus {
+			go g.network.Wait(network.WaitRequest{Uuid: uuid}, g.waitResponse)
+			if r.DestroyedShip != "" {
+				g.destroyShip(g.field, r.DestroyedShip, int(r.DestroyedX), int(r.DestroyedY))
+			}
 			g.field.SetHitCell(int(r.X), int(r.Y))
 		}
+	}
+}
+
+func (g *Game) destroyShip(f *field.Field, ship network.Ship, x, y int) {
+	switch ship {
+	case network.SingleDeckShip:
+		f.DestroyShip(field.SingleDeckShip, x, y)
+	case network.DoubleDeckShipDown:
+		f.DestroyShip(field.DoubleDeckShipDown, x, y)
+	case network.ThreeDeckShipDown:
+		f.DestroyShip(field.ThreeDeckShipDown, x, y)
+	case network.FourDeckShipDown:
+		f.DestroyShip(field.FourDeckShipDown, x, y)
+	case network.DoubleDeckShipRight:
+		f.DestroyShip(field.DoubleDeckShipRight, x, y)
+	case network.ThreeDeckShipRight:
+		f.DestroyShip(field.ThreeDeckShipRight, x, y)
+	case network.FourDeckShipRight:
+		f.DestroyShip(field.FourDeckShipRight, x, y)
 	}
 }
 

@@ -201,7 +201,9 @@ func (n *Network) Wait(input WaitRequest, ch chan<- WaitResponse) {
 			"application/json",
 			bytes.NewReader(body),
 		)
-		statusCode = response.StatusCode
+		if response != nil {
+			statusCode = response.StatusCode
+		}
 	}
 	defer response.Body.Close()
 
@@ -222,11 +224,14 @@ func (n *Network) Wait(input WaitRequest, ch chan<- WaitResponse) {
 	}
 
 	ch <- WaitResponse{
-		Status:  GameStatus(wait.Status),
-		X:       wait.X,
-		Y:       wait.Y,
-		Message: wait.Message,
-		Error:   nil,
+		Status:        GameStatus(wait.Status),
+		X:             wait.X,
+		Y:             wait.Y,
+		DestroyedShip: Ship(wait.DestroyedShip),
+		DestroyedX:    wait.DestroyedX,
+		DestroyedY:    wait.DestroyedY,
+		Message:       wait.Message,
+		Error:         nil,
 	}
 }
 

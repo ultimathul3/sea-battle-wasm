@@ -48,17 +48,35 @@ func (f *Field) DestroyShip(ship Ship, x, y int) {
 		f.fillRightCells(y+1, x+1, MissCell)
 		f.fillTopAndBottomCells(y+1, x+1, MissCell)
 	case DoubleDeckShipDown:
+		f.cleanDown(y+1, x+1, 2)
 		f.placeShipDown(y+1, x+1, MissCell, 2)
 	case ThreeDeckShipDown:
+		f.cleanDown(y+1, x+1, 3)
 		f.placeShipDown(y+1, x+1, MissCell, 3)
 	case FourDeckShipDown:
+		f.cleanDown(y+1, x+1, 4)
 		f.placeShipDown(y+1, x+1, MissCell, 4)
 	case DoubleDeckShipRight:
+		f.cleanRight(y+1, x+1, 2)
 		f.placeShipRight(y+1, x+1, MissCell, 2)
 	case ThreeDeckShipRight:
+		f.cleanRight(y+1, x+1, 3)
 		f.placeShipRight(y+1, x+1, MissCell, 3)
 	case FourDeckShipRight:
+		f.cleanRight(y+1, x+1, 4)
 		f.placeShipRight(y+1, x+1, MissCell, 4)
+	}
+}
+
+func (f *Field) cleanRight(i, j, count int) {
+	for l := 0; l < count; l++ {
+		f.fieldMatrix[i][j+l] = EmptyCell
+	}
+}
+
+func (f *Field) cleanDown(i, j, count int) {
+	for l := 0; l < count; l++ {
+		f.fieldMatrix[i+l][j] = EmptyCell
 	}
 }
 
