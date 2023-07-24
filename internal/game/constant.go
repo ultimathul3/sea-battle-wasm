@@ -20,6 +20,7 @@ const (
 	YourTurnText         = "Ваш ход"
 	PlayerTurnTextFmt    = "Ход игрока %s"
 	PlayerWaitingTextFmt = "Ожидание игрока %s..."
+	PlayerWonTextFmt     = "%s победил"
 	LoadText             = "LOADING..."
 )
 

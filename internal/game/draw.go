@@ -36,6 +36,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.drawHostWaitOpponentState(screen)
 	case HostGameStartedState:
 		g.drawHostGameStartedState(screen)
+	case HostWonState:
+		g.drawHostWonState(screen)
+	case OpponentWonState:
+		g.drawOpponentWonState(screen)
 	}
 }
 
@@ -137,6 +141,24 @@ func (g *Game) drawHostGameStartedState(screen *ebiten.Image) {
 	} else {
 		g.text.DrawMediumInCenter(screen, fmt.Sprintf(PlayerTurnTextFmt, g.hostNickname), 9, color.White)
 	}
+}
+
+func (g *Game) drawHostWonState(screen *ebiten.Image) {
+	g.backButton.Draw(screen, 9, 9)
+
+	g.field.Draw(screen)
+	g.opponentField.Draw(screen)
+
+	g.text.DrawMediumInCenter(screen, fmt.Sprintf(PlayerWonTextFmt, g.hostNickname), 9, color.White)
+}
+
+func (g *Game) drawOpponentWonState(screen *ebiten.Image) {
+	g.backButton.Draw(screen, 9, 9)
+
+	g.field.Draw(screen)
+	g.opponentField.Draw(screen)
+
+	g.text.DrawMediumInCenter(screen, fmt.Sprintf(PlayerWonTextFmt, g.opponentNickname), 9, color.White)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

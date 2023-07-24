@@ -42,18 +42,6 @@ type Field struct {
 	state FieldState
 }
 
-func (f *Field) GetFieldMatrix() [][]rune {
-	return f.fieldMatrix
-}
-
-func (f *Field) SetFieldMatrix(matrix [][]rune) {
-	f.fieldMatrix = matrix
-	f.availableSingleDeckShips = 0
-	f.availableDoubleDeckShips = 0
-	f.availableThreeDeckShips = 0
-	f.availableFourDeckShips = 0
-}
-
 func New(
 	offsetX, offsetY int,
 	assets *assets.Assets, transparentColor color.Color, text Texter, touch Toucher,

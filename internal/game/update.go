@@ -34,6 +34,10 @@ func (g *Game) Update() error {
 		g.updateHostWaitOpponentState()
 	case HostGameStartedState:
 		g.updateHostGameStartedState()
+	case HostWonState:
+		g.updateHostWonState()
+	case OpponentWonState:
+		g.updateOpponentWonState()
 	}
 
 	return nil
@@ -43,39 +47,11 @@ func (g *Game) updateMenuState() {
 	g.createGameButton.Update(func() {
 		g.state = CreateGameState
 		g.resetGame()
-		g.field.SetFieldMatrix([][]rune{
-			[]rune("~~~~~~~~~~~~"),
-			[]rune("~          ~"),
-			[]rune("~          ~"),
-			[]rune("xxx     xxxx"),
-			[]rune("x1x     x@◄x"),
-			[]rune("xxxxxxxxxxxx"),
-			[]rune("x1xx$←←◄x  ~"),
-			[]rune("xxxxxxxxxxx~"),
-			[]rune("x1x#←◄xx@◄x~"),
-			[]rune("xxxxxxxxxxx~"),
-			[]rune("x1x#←◄xx@◄x~"),
-			[]rune("xxxxxxxxxxx~"),
-		})
 	})
 
 	g.joinGameButton.Update(func() {
 		g.state = JoinGameState
 		g.resetGame()
-		g.field.SetFieldMatrix([][]rune{
-			[]rune("~~~~~~~~~~~~"),
-			[]rune("~          ~"),
-			[]rune("~   xxx    ~"),
-			[]rune("~xxxx2x    ~"),
-			[]rune("~x1xx▲x    ~"),
-			[]rune("xxxxxxx xxx~"),
-			[]rune("x1x   xxx2x~"),
-			[]rune("xxxxxxx4x▲x~"),
-			[]rune("x1x3x3x↑xxx~"),
-			[]rune("xxx↑x↑x↑x2x~"),
-			[]rune("x1x▲x▲x▲x▲x~"),
-			[]rune("xxxxxxxxxxx~"),
-		})
 		go g.network.GetGames(g.getGamesResponse)
 	})
 }
@@ -237,22 +213,32 @@ func (g *Game) updateGameStartedState(turn Turn) {
 	var uuid string
 	var missStatus, hitStatus network.GameStatus
 	var oppositeMissStatus, oppositeHitStatus network.GameStatus
+	var wonState, oppositeWonState GameState
+	var wonStatus, oppositeWonStatus network.GameStatus
 	var oppositeTurn Turn
 
 	if turn == HostTurn {
 		uuid = g.hostUuid
 		missStatus = network.HostMissStatus
 		hitStatus = network.HostHitStatus
+		wonStatus = network.HostWonStatus
+		wonState = HostWonState
+		oppositeWonState = OpponentWonState
 		oppositeTurn = OpponentTurn
 		oppositeMissStatus = network.OpponentMissStatus
 		oppositeHitStatus = network.OpponentHitStatus
+		oppositeWonStatus = network.OpponentWonStatus
 	} else {
 		uuid = g.opponentUuid
 		missStatus = network.OpponentMissStatus
 		hitStatus = network.OpponentHitStatus
+		wonStatus = network.OpponentWonStatus
+		wonState = OpponentWonState
+		oppositeWonState = HostWonState
 		oppositeTurn = HostTurn
 		oppositeMissStatus = network.HostMissStatus
 		oppositeHitStatus = network.HostHitStatus
+		oppositeWonStatus = network.HostWonStatus
 	}
 
 	x, y, isTouched := g.opponentField.IsEmptyCellTouched()
@@ -280,6 +266,10 @@ func (g *Game) updateGameStartedState(turn Turn) {
 				g.destroyShip(g.opponentField, r.DestroyedShip, int(r.X), int(r.Y))
 			}
 			g.opponentField.SetHitCell(g.lastX, g.lastY)
+		} else if r.Status == wonStatus {
+			g.destroyShip(g.opponentField, r.DestroyedShip, int(r.X), int(r.Y))
+			g.opponentField.SetHitCell(g.lastX, g.lastY)
+			g.state = wonState
 		}
 		g.isShot = false
 	}
@@ -296,8 +286,30 @@ func (g *Game) updateGameStartedState(turn Turn) {
 				g.destroyShip(g.field, r.DestroyedShip, int(r.DestroyedX), int(r.DestroyedY))
 			}
 			g.field.SetHitCell(int(r.X), int(r.Y))
+		} else if r.Status == oppositeWonStatus {
+			g.destroyShip(g.field, r.DestroyedShip, int(r.DestroyedX), int(r.DestroyedY))
+			g.field.SetHitCell(int(r.X), int(r.Y))
+			g.state = oppositeWonState
 		}
 	}
+}
+
+func (g *Game) updateHostWonState() {
+	g.backButton.Update(func() {
+		g.state = MenuState
+	})
+
+	g.field.Update()
+	g.opponentField.Update()
+}
+
+func (g *Game) updateOpponentWonState() {
+	g.backButton.Update(func() {
+		g.state = MenuState
+	})
+
+	g.field.Update()
+	g.opponentField.Update()
 }
 
 func (g *Game) destroyShip(f *field.Field, ship network.Ship, x, y int) {

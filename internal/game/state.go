@@ -11,4 +11,6 @@ const (
 	OpponentGameStartedState
 	HostWaitOpponentState
 	HostGameStartedState
+	HostWonState
+	OpponentWonState
 )
