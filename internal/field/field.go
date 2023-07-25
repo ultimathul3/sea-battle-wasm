@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/ultimathul3/sea-battle-wasm/assets"
+	"github.com/ultimathul3/sea-battle-wasm/internal/animation"
 )
 
 type Texter interface {
@@ -40,6 +41,8 @@ type Field struct {
 	i, j        int
 
 	state FieldState
+
+	explosionAnimation *animation.Animation
 }
 
 func (f *Field) GetFieldMatrix() [][]rune {
@@ -85,6 +88,10 @@ func New(
 	}
 
 	f.initFieldMatrix()
+
+	f.explosionAnimation = animation.New(
+		f.assets.ExplosionImages,
+	)
 
 	return f
 }

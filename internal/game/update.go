@@ -275,12 +275,14 @@ func (g *Game) updateGameStartedState(turn Turn) {
 			g.opponentField.SetHitCell(g.lastX, g.lastY)
 			g.assets.HitPlayer.Rewind()
 			g.assets.HitPlayer.Play()
+			g.opponentField.PlayExplosionAnimation(g.lastX, g.lastY)
 		} else if r.Status == wonStatus {
 			g.destroyShip(g.opponentField, r.DestroyedShip, int(r.X), int(r.Y))
 			g.opponentField.SetHitCell(g.lastX, g.lastY)
 			g.state = wonState
 			g.assets.HitPlayer.Rewind()
 			g.assets.HitPlayer.Play()
+			g.opponentField.PlayExplosionAnimation(g.lastX, g.lastY)
 		}
 		g.isShot = false
 	}
@@ -301,12 +303,14 @@ func (g *Game) updateGameStartedState(turn Turn) {
 			g.field.SetHitCell(int(r.X), int(r.Y))
 			g.assets.HitPlayer.Rewind()
 			g.assets.HitPlayer.Play()
+			g.field.PlayExplosionAnimation(int(r.X), int(r.Y))
 		} else if r.Status == oppositeWonStatus {
 			g.destroyShip(g.field, r.DestroyedShip, int(r.DestroyedX), int(r.DestroyedY))
 			g.field.SetHitCell(int(r.X), int(r.Y))
 			g.state = oppositeWonState
 			g.assets.HitPlayer.Rewind()
 			g.assets.HitPlayer.Play()
+			g.field.PlayExplosionAnimation(int(r.X), int(r.Y))
 		}
 	}
 }

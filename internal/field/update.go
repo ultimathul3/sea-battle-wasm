@@ -16,10 +16,16 @@ func (f *Field) Update() {
 	f.i = (my-f.offsetY-TileSize)/TileSize + 1
 	f.j = (mx-f.offsetX-TileSize)/TileSize + 1
 
+	f.explosionAnimation.Update()
+
 	switch f.state {
 	case PlacementState:
 		f.updatePlacementState(tx, ty, mx, my, isTouched)
 	}
+}
+
+func (f *Field) PlayExplosionAnimation(x, y int) {
+	f.explosionAnimation.Play(f.getX(x+1), f.getY(y+1))
 }
 
 func (f *Field) IsEmptyCellTouched() (int, int, bool) {

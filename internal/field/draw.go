@@ -46,6 +46,8 @@ func (f *Field) Draw(screen *ebiten.Image) {
 	case ShootState:
 		f.drawShootState(screen)
 	}
+
+	f.explosionAnimation.Draw(screen)
 }
 
 func (f *Field) drawCurtainState(screen *ebiten.Image) {

@@ -43,6 +43,8 @@ type Assets struct {
 
 	MissImage *ebiten.Image
 	HitImage  *ebiten.Image
+
+	ExplosionImages []*ebiten.Image
 }
 
 func New() *Assets {
@@ -71,6 +73,8 @@ func New() *Assets {
 
 		MissImage: imageFromBytes(MissImage),
 		HitImage:  imageFromBytes(HitImage),
+
+		ExplosionImages: loadExplosionImages(),
 	}
 
 	assets.ButtonTickPlayer, assets.HitPlayer, assets.MissPlayer, assets.ThemePlayer = loadSounds()
@@ -171,6 +175,28 @@ func loadBackgroundImages() []*ebiten.Image {
 
 		data, err := BackgroundImagesDir.ReadFile(
 			fmt.Sprintf("%s/%d.png", BackgroundImagesDirPath, i),
+		)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		images = append(images, imageFromBytes(data))
+	}
+
+	return images
+}
+
+func loadExplosionImages() []*ebiten.Image {
+	var images []*ebiten.Image
+
+	dir, err := ExplosionImagesDir.ReadDir(ExplosionImagesDirPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for i := range dir {
+		data, err := ExplosionImagesDir.ReadFile(
+			fmt.Sprintf("%s/%d.png", ExplosionImagesDirPath, i),
 		)
 		if err != nil {
 			log.Fatal(err)

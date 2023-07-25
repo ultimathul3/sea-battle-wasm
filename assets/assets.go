@@ -73,3 +73,9 @@ var (
 	//go:embed images/field/hit.png
 	HitImage []byte
 )
+
+var (
+	//go:embed images/field/explosion
+	ExplosionImagesDir     embed.FS
+	ExplosionImagesDirPath = "images/field/explosion"
+)
