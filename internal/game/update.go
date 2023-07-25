@@ -40,6 +40,11 @@ func (g *Game) Update() error {
 		g.updateOpponentWonState()
 	}
 
+	if !g.assets.ThemePlayer.IsPlaying() {
+		g.assets.ThemePlayer.Rewind()
+		g.assets.ThemePlayer.Play()
+	}
+
 	return nil
 }
 
@@ -261,15 +266,21 @@ func (g *Game) updateGameStartedState(turn Turn) {
 			go g.network.Wait(network.WaitRequest{Uuid: uuid}, g.waitResponse)
 			g.opponentField.SetMissCell(g.lastX, g.lastY)
 			g.turn = oppositeTurn
+			g.assets.MissPlayer.Rewind()
+			g.assets.MissPlayer.Play()
 		} else if r.Status == hitStatus {
 			if r.DestroyedShip != "" {
 				g.destroyShip(g.opponentField, r.DestroyedShip, int(r.X), int(r.Y))
 			}
 			g.opponentField.SetHitCell(g.lastX, g.lastY)
+			g.assets.HitPlayer.Rewind()
+			g.assets.HitPlayer.Play()
 		} else if r.Status == wonStatus {
 			g.destroyShip(g.opponentField, r.DestroyedShip, int(r.X), int(r.Y))
 			g.opponentField.SetHitCell(g.lastX, g.lastY)
 			g.state = wonState
+			g.assets.HitPlayer.Rewind()
+			g.assets.HitPlayer.Play()
 		}
 		g.isShot = false
 	}
@@ -280,16 +291,22 @@ func (g *Game) updateGameStartedState(turn Turn) {
 		if r.Status == oppositeMissStatus {
 			g.field.SetMissCell(int(r.X), int(r.Y))
 			g.turn = turn
+			g.assets.MissPlayer.Rewind()
+			g.assets.MissPlayer.Play()
 		} else if r.Status == oppositeHitStatus {
 			go g.network.Wait(network.WaitRequest{Uuid: uuid}, g.waitResponse)
 			if r.DestroyedShip != "" {
 				g.destroyShip(g.field, r.DestroyedShip, int(r.DestroyedX), int(r.DestroyedY))
 			}
 			g.field.SetHitCell(int(r.X), int(r.Y))
+			g.assets.HitPlayer.Rewind()
+			g.assets.HitPlayer.Play()
 		} else if r.Status == oppositeWonStatus {
 			g.destroyShip(g.field, r.DestroyedShip, int(r.DestroyedX), int(r.DestroyedY))
 			g.field.SetHitCell(int(r.X), int(r.Y))
 			g.state = oppositeWonState
+			g.assets.HitPlayer.Rewind()
+			g.assets.HitPlayer.Play()
 		}
 	}
 }

@@ -86,6 +86,8 @@ func (g *Game) load() {
 	g.updateButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, updateButtonText, LightGrayColor, DarkGreenColor)
 	g.startButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, startButtonText, LightGrayColor, DarkGreenColor)
 
+	g.assets.ThemePlayer.Play()
+
 	close(g.loadChannel)
 }
 
@@ -109,6 +111,40 @@ func (g *Game) resetGame() {
 	} else {
 		g.hostNickname = os.Args[1]
 		g.opponentNickname = os.Args[1]
+	}
+
+	if os.Getenv("DEVELOPMENT") == "1" {
+		if g.state == CreateGameState {
+			g.field.SetFieldMatrix([][]rune{
+				[]rune("~~~~~~~~~~~~"),
+				[]rune("~          ~"),
+				[]rune("~          ~"),
+				[]rune("xxx     xxxx"),
+				[]rune("x1x     x@◄x"),
+				[]rune("xxxxxxxxxxxx"),
+				[]rune("x1xx$←←◄x  ~"),
+				[]rune("xxxxxxxxxxx~"),
+				[]rune("x1x#←◄xx@◄x~"),
+				[]rune("xxxxxxxxxxx~"),
+				[]rune("x1x#←◄xx@◄x~"),
+				[]rune("xxxxxxxxxxx~"),
+			})
+		} else if g.state == JoinGameState {
+			g.field.SetFieldMatrix([][]rune{
+				[]rune("~~~~~~~~~~~~"),
+				[]rune("~          ~"),
+				[]rune("~   xxx    ~"),
+				[]rune("~xxxx2x    ~"),
+				[]rune("~x1xx▲x    ~"),
+				[]rune("xxxxxxx xxx~"),
+				[]rune("x1x   xxx2x~"),
+				[]rune("xxxxxxx4x▲x~"),
+				[]rune("x1x3x3x↑xxx~"),
+				[]rune("xxx↑x↑x↑x2x~"),
+				[]rune("x1x▲x▲x▲x▲x~"),
+				[]rune("xxxxxxxxxxx~"),
+			})
+		}
 	}
 
 	g.getGamesResponse = make(chan network.GetGamesResponse)

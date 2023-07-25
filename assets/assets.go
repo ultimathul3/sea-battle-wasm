@@ -21,7 +21,14 @@ var (
 
 var (
 	//go:embed sounds/button_tick.ogg
-	ButtonTickSound  []byte
+	ButtonTickSound []byte
+	//go:embed sounds/hit.ogg
+	HitSound []byte
+	//go:embed sounds/miss.ogg
+	MissSound []byte
+	//go:embed sounds/theme.ogg
+	ThemeSound []byte
+
 	SoundsSampleRate = 44100
 )
 

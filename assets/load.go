@@ -19,7 +19,11 @@ type Assets struct {
 	BackgroundImages []*ebiten.Image
 	LargeFont        font.Face
 	MediumFont       font.Face
+
 	ButtonTickPlayer *audio.Player
+	HitPlayer        *audio.Player
+	MissPlayer       *audio.Player
+	ThemePlayer      *audio.Player
 
 	SingleDeckShipImage *ebiten.Image
 	DoubleDeckShipImage *ebiten.Image
@@ -44,11 +48,10 @@ type Assets struct {
 func New() *Assets {
 	largeFont, mediumFont := loadFonts()
 
-	return &Assets{
+	assets := &Assets{
 		BackgroundImages: loadBackgroundImages(),
 		LargeFont:        largeFont,
 		MediumFont:       mediumFont,
-		ButtonTickPlayer: loadSounds(),
 
 		SingleDeckShipImage: imageFromBytes(SingleDeckShipImage),
 		DoubleDeckShipImage: imageFromBytes(DoubleDeckShipImage),
@@ -69,9 +72,13 @@ func New() *Assets {
 		MissImage: imageFromBytes(MissImage),
 		HitImage:  imageFromBytes(HitImage),
 	}
+
+	assets.ButtonTickPlayer, assets.HitPlayer, assets.MissPlayer, assets.ThemePlayer = loadSounds()
+
+	return assets
 }
 
-func loadSounds() *audio.Player {
+func loadSounds() (*audio.Player, *audio.Player, *audio.Player, *audio.Player) {
 	context := audio.NewContext(SoundsSampleRate)
 
 	buttonTickStream, err := vorbis.DecodeWithSampleRate(SoundsSampleRate, bytes.NewReader(ButtonTickSound))
@@ -84,9 +91,42 @@ func loadSounds() *audio.Player {
 		log.Fatal(err)
 	}
 
-	buttonTickPlayer.SetVolume(0.3)
+	hitStream, err := vorbis.DecodeWithSampleRate(SoundsSampleRate, bytes.NewReader(HitSound))
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	return buttonTickPlayer
+	hitPlayer, err := context.NewPlayer(hitStream)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	missStream, err := vorbis.DecodeWithSampleRate(SoundsSampleRate, bytes.NewReader(MissSound))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	missPlayer, err := context.NewPlayer(missStream)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	themeStream, err := vorbis.DecodeWithSampleRate(SoundsSampleRate, bytes.NewReader(ThemeSound))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	themePlayer, err := context.NewPlayer(themeStream)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	buttonTickPlayer.SetVolume(0.25)
+	hitPlayer.SetVolume(0.09)
+	missPlayer.SetVolume(0.01)
+	themePlayer.SetVolume(0.01)
+
+	return buttonTickPlayer, hitPlayer, missPlayer, themePlayer
 }
 
 func loadFonts() (font.Face, font.Face) {
