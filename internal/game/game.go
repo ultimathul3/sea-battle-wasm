@@ -76,7 +76,7 @@ func (g *Game) load() {
 	g.assets = assets.New()
 	g.background = background.New(g.assets.BackgroundImages)
 	g.text = text.New(g.assets.LargeFont, g.assets.MediumFont, yLargeFontOffset, yMediumFontOffset, yMediumFontCharWidth, yMediumFontSizeBetweenChars)
-	g.network = network.New(g.cfg.HttpServer.Host, g.cfg.HttpServer.Port)
+	g.network = network.New(g.cfg.HttpServer.Host)
 
 	g.createGameButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, createGameText, GrayColor, GreenColor)
 	g.joinGameButton = button.New(g.text, g.touch, g.assets.ButtonTickPlayer, joinGameText, GrayColor, GreenColor)

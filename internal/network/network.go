@@ -10,18 +10,16 @@ import (
 
 type Network struct {
 	serverHost string
-	serverPort uint16
 }
 
-func New(serverHost string, serverPort uint16) *Network {
+func New(serverHost string) *Network {
 	return &Network{
 		serverHost: serverHost,
-		serverPort: serverPort,
 	}
 }
 
 func (n *Network) GetGames(ch chan<- GetGamesResponse) {
-	response, err := http.Get(fmt.Sprintf("%s:%d/games", n.serverHost, n.serverPort))
+	response, err := http.Get(fmt.Sprintf("%s/games", n.serverHost))
 	if err != nil {
 		ch <- GetGamesResponse{
 			Error: err,
@@ -62,7 +60,7 @@ func (n *Network) CreateGame(input CreateGameRequest, ch chan<- CreateGameRespon
 	}
 
 	response, err := http.Post(
-		fmt.Sprintf("%s:%d/games", n.serverHost, n.serverPort),
+		fmt.Sprintf("%s/games", n.serverHost),
 		"application/json",
 		bytes.NewReader(body),
 	)
@@ -106,7 +104,7 @@ func (n *Network) JoinGame(input JoinGameRequest, ch chan<- JoinGameResponse) {
 	}
 
 	response, err := http.Post(
-		fmt.Sprintf("%s:%d/games/join", n.serverHost, n.serverPort),
+		fmt.Sprintf("%s/games/join", n.serverHost),
 		"application/json",
 		bytes.NewReader(body),
 	)
@@ -150,7 +148,7 @@ func (n *Network) StartGame(input StartGameRequest, ch chan<- StartGameResponse)
 	}
 
 	response, err := http.Post(
-		fmt.Sprintf("%s:%d/games/start", n.serverHost, n.serverPort),
+		fmt.Sprintf("%s/games/start", n.serverHost),
 		"application/json",
 		bytes.NewReader(body),
 	)
@@ -197,7 +195,7 @@ func (n *Network) Wait(input WaitRequest, ch chan<- WaitResponse) {
 
 	for err != nil || statusCode != 200 {
 		response, err = http.Post(
-			fmt.Sprintf("%s:%d/games/wait", n.serverHost, n.serverPort),
+			fmt.Sprintf("%s/games/wait", n.serverHost),
 			"application/json",
 			bytes.NewReader(body),
 		)
@@ -245,7 +243,7 @@ func (n *Network) Shoot(input ShootRequest, ch chan<- ShootResponse) {
 	}
 
 	response, err := http.Post(
-		fmt.Sprintf("%s:%d/games/shoot", n.serverHost, n.serverPort),
+		fmt.Sprintf("%s/games/shoot", n.serverHost),
 		"application/json",
 		bytes.NewReader(body),
 	)

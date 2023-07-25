@@ -2,7 +2,6 @@ package config
 
 type HttpServer struct {
 	Host string
-	Port uint16
 }
 
 type Config struct {
@@ -13,8 +12,7 @@ type Config struct {
 func New() *Config {
 	return &Config{
 		HttpServer{
-			Host: "http://localhost",
-			Port: 8082,
+			Host: "https://ultimathul3.ru/sea-server",
 		},
 		"test",
 	}
