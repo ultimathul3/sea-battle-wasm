@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Network struct {
@@ -201,6 +202,10 @@ func (n *Network) Wait(input WaitRequest, ch chan<- WaitResponse) {
 		)
 		if response != nil {
 			statusCode = response.StatusCode
+		}
+
+		if err != nil || statusCode != 200 {
+			time.Sleep(1 * time.Second)
 		}
 	}
 	defer response.Body.Close()
